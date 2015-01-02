@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.whut.classmateCard.business.classmate.mapper.ClassmateMapper">
+    <sql id="classmate_fields">
+		id,name,telephone,address,job,jobContent,arrangement,note
+	</sql>
+
+    <resultMap id="classmateResultMap" type="Classmate">
+        <id property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="telephone" column="TELEPHONE"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="job" column="JOB"/>
+        <result property="jobContent" column="JOBCONTENT"/>
+        <result property="arrangement" column="ARRANGEMENT"/>
+        <result property="note" column="NOTE"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Classmate" keyProperty="id"
+            useGeneratedKeys="true">
+        INSERT INTO
+        classmate(
+        <include refid="classmate_fields" />
+        )
+        VALUES (#{id},#{name},#{telephone},#{address},#{job},#{jobContent},#{arrangement},#{note});
+        <selectKey resultType="long" keyProperty="id">
+            select
+            LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <select id="totalCount" parameterType="map" resultType="java.lang.Long">
+        SELECT count(id)
+        FROM classmate
+    </select>
+
+
+    <update id="update" parameterType="Classmate">
+        UPDATE classmate
+        <set>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="telephone != null">TELEPHONE=#{telephone},</if>
+            <if test="address != null">ADDRESS=#{address},</if>
+            <if test="job!=null">JOB=#{job},</if>
+            <if test="jobContent!=null">JOBCONTENT=#{jobContent},</if>
+            <if test="arrangement!=null">ARRANGEMENT=#{arrangement},</if>
+            <if test="note!=null">NOTE=#{note},</if>
+
+        </set>
+        WHERE ID = #{id};
+    </update>
+
+    <delete id="delete" parameterType="Classmate">
+        DELETE FROM classmate
+        <where>
+            <if test="id != null">ID=#{id}</if>
+            <if test="name != null">AND NAME=#{name}</if>
+        </where>
+    </delete>
+
+    <select id="get" parameterType="Classmate" resultMap="classmateResultMap">
+        SELECT
+        <include refid="classmate_fields" />
+        FROM classmate WHERE ID=#{id}
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultMap="classmateResultMap">
+        SELECT
+        <include refid="classmate_fields" />
+        FROM classmate where name=#{name}
+    </select>
+
+    <select id="findByCondition" parameterType="map" resultType="map">
+        SELECT
+        <include refid="classmate_fields"/>
+        FROM classmate
+        <where>
+            <if test="name != null">NAME=#{name}</if>
+            <if test="telephone != null"> AND dTELEPHONE=#{telephone}</if>
+            <if test="address != null"> AND ADDRESS=#{address}</if>
+            <if test="job!=null"> AND JOB=#{job}</if>
+            <if test="jobContent!=null"> AND JOBCONTENT=#{jobContent</if>
+            <if test="arrangement!=null"> AND ARRANGEMENT=#{arrangement}</if>
+            <if test="note!=null"> AND NOTE=#{note}</if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.whut.platform.business.template.mapper.TemplateMapper">
+    <sql id="template_fields">
+		ID,NUMBER,NAME,DESCRIPTION,VIEWCOUNT,USECOUNT,STATUS,CREATETIME,URL,APPID
+	</sql>
+
+    <resultMap id="templateResultMap" type="Template">
+        <id property="id" column="ID"/>
+        <result property="number" column="NUMBER"/>
+        <result property="name" column="NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="viewCount" column="VIEWCOUNT"/>
+        <result property="useCount" column="USECOUNT"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATETIME"/>
+        <result property="url" column="URL"/>
+        <result property="appId" column="APPID"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Template" keyProperty="id"
+            useGeneratedKeys="true">
+        INSERT INTO
+        template(
+        <include refid="template_fields" />
+        )
+        VALUES (#{id},#{number},#{name},#{description},#{viewCount},#{useCount},#{status},#{createTime},#{url},#{appId});
+        <selectKey resultType="long" keyProperty="id">
+            select
+            LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <select id="totalCount" parameterType="map" resultType="java.lang.Long">
+        SELECT count(id)
+        FROM template
+    </select>
+
+
+    <update id="update" parameterType="Template">
+        UPDATE template
+        <set>
+            <if test="name != null">NAME=#{name},</if>
+            <if test="description != null">DESCRIPTION=#{description},</if>
+            <if test="status != null">STATUS=#{status},</if>
+            <if test="viewCount!=null">viewCount=#{viewCount},</if>
+            <if test="useCount!=null">useCount=#{useCount}</if>
+        </set>
+        WHERE ID = #{id};
+    </update>
+
+    <update id="updateResource" parameterType="Template">
+        UPDATE template
+        <set>
+            <if test="url != null">URL=#{url}</if>
+        </set>
+        WHERE ID = #{id};
+    </update>
+
+    <delete id="delete" parameterType="Template">
+        DELETE FROM template
+        <where>
+            <if test="id != null">ID=#{id}</if>
+            <if test="name != null">AND NAME=#{name}</if>
+        </where>
+    </delete>
+
+    <select id="get" parameterType="Template" resultMap="templateResultMap">
+        SELECT
+        <include refid="template_fields" />
+        FROM template WHERE ID=#{id}
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultMap="templateResultMap">
+        SELECT
+        <include refid="template_fields" />
+        FROM template where name=#{name}
+    </select>
+
+    <select id="findByCondition" parameterType="map" resultMap="templateResultMap">
+        SELECT
+        <include refid="template_fields"/>
+        FROM template
+        <where>
+            <if test="name!=null">NAME=#{name}</if>
+            <if test="description!=null">AND DESCRIPTION=#{description}</if>
+            <if test="status!=null">AND STATUS=#{status}</if>
+        </where>
+    </select>
+
+    <select id="getNameById" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT name
+        FROM template WHERE ID=#{id}
+    </select>
+
+    <select id="getIdByName" parameterType="java.lang.String" resultType="java.lang.Long">
+         SELECT
+         id
+         FROM template WHERE NAME=#{name}
+     </select>
+
+
+</mapper>

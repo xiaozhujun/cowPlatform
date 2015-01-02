@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cowPlatform</artifactId>
+        <groupId>cowPlatform</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+
+    <artifactId>fundamental</artifactId>
+
+    <modules>
+        <module>fundamental-util</module>
+        <module>fundamental-orm</module>
+        <module>fundamental-config</module>
+        <module>fundamental-exception</module>
+        <module>fundamental-logger</module>
+        <module>fundamental-datasource</module>
+        <module>fundamental-mail</module>
+        <module>fundamental-fileupload</module>
+        <module>fundamental-mongoConnector</module>
+        <module>fundamental-redisConnector</module>
+    </modules>
+
+
+</project>
