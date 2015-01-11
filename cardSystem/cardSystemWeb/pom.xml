@@ -93,5 +93,19 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>cowPlatform</groupId>
+            <artifactId>business-category</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cowPlatform</groupId>
+            <artifactId>business-template</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+
     </dependencies>
 </project>

@@ -23,7 +23,7 @@ public class ZipUtil {
             File file = new File(zipFilePath);//压缩文件
             ZipFile zipFile = new ZipFile(file);//实例化ZipFile，每一个zip压缩文件都可以表示为一个ZipFile
             //实例化一个Zip压缩文件的ZipInputStream对象，可以利用该类的getNextEntry()方法依次拿到每一个ZipEntry对象
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file), Charset.forName("UTF-8"));
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file));
             ZipEntry zipEntry = null;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 String fileName = zipEntry.getName();

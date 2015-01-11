@@ -5,17 +5,17 @@
 
 <mapper namespace="org.whut.platform.business.category.mapper.CategoryMapper">
     <sql id="category_fields">
-		ID,NAME,DESCRIPTION,INDEX,STATUS,CREATETIME,APPID
+		id,name,description,sort,status,createTime,appId
 	</sql>
 
-    <resultMap id="categoryResultMap" type="Category">
-        <id property="id" column="ID"/>
-        <result property="name" column="NAME"/>
-        <result property="description" column="DESCRIPTION"/>
-        <result property="index" column="INDEX"/>
-        <result property="status" column="STATUS"/>
-        <result property="createTime" column="CREATETIME"/>
-        <result property="appId" column="APPID"/>
+    <resultMap id="categoryResultMap" type="category">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="createTime"/>
+        <result property="appId" column="appId"/>
     </resultMap>
 
     <insert id="add" parameterType="Category" keyProperty="id"
@@ -24,7 +24,7 @@
         category(
         <include refid="category_fields" />
         )
-        VALUES (#{id},#{name},#{description},#{index},#{status},#{createTime},#{appId});
+        VALUES (#{id},#{name},#{description},#{sort},#{status},#{createTime},#{appId});
         <selectKey resultType="long" keyProperty="id">
             select
             LAST_INSERT_ID() as id
@@ -43,7 +43,7 @@
             <if test="name != null">NAME=#{name},</if>
             <if test="description != null">DESCRIPTION=#{description},</if>
             <if test="status != null">STATUS=#{status},</if>
-            <if test="index!=null">INDEX=#{index}</if>
+            <if test="sort!=null">SORT=#{sort}</if>
         </set>
         WHERE ID = #{id};
     </update>
@@ -52,7 +52,6 @@
         DELETE FROM category
         <where>
             <if test="id != null">ID=#{id}</if>
-            <if test="name != null">AND NAME=#{name}</if>
         </where>
     </delete>
 
@@ -77,7 +76,7 @@
             <if test="description!=null">AND DESCRIPTION=#{description}</if>
             <if test="status!=null">AND STATUS=#{status}</if>
         </where>
-        order by index asc
+        order by sort asc
     </select>
 
     <select id="getNameById" parameterType="java.lang.Long" resultType="java.lang.String">

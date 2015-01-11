@@ -15,7 +15,7 @@
     <modules>
         <module>business-app</module>
         <module>business-user</module>
-        <module>bunsiness-template</module>
+        <module>business-template</module>
         <module>business-category</module>
     </modules>
 

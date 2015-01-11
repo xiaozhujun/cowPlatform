@@ -5,6 +5,7 @@ import org.whut.platform.business.category.entity.Category;
 import org.whut.platform.business.category.mapper.CategoryMapper;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +34,7 @@ public class CategoryService {
         return categoryMapper.get(category);
     }
 
-    public HashMap<String,Object> findByCondition(HashMap<String,String> condition){
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition){
         return categoryMapper.findByCondition(condition);
     }
 

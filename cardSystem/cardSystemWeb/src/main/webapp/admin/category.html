@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="lib/ligerUI/skins/Aqua/css/ligerui-all.css" rel="stylesheet" type="text/css" />
+    <script src="lib/json2.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerDialog.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerTextBox.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerCheckBox.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerComboBox.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerGrid.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerDateEditor.js" type="text/javascript"></script>
+    <script src="lib/ligerUI/js/plugins/ligerSpinner.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            $.post("../"+$.URL.category.findByCondition,{"jsonString":"{}"},category_listCallback,"json");
+        }) ;
+        var category_gridData={};
+        function category_listCallback(data){
+            if(data.code==200)
+            {
+                category_gridData.Rows=data.data;
+                category_gridData.Total=data.data.length;
+                category_f_initGrid();
+            }
+        }
+
+        var category_manager,g;
+        function category_f_initGrid(){
+            g=category_manager = $("#category_maingrid").ligerGrid( {
+
+                columns:[
+                    {display:'主键',name:'id',width:50,type:'int',frozen:true} ,
+                    {display:'类型名称',name:'name',
+                        editor:{type:'text'}
+                    } ,
+                    {display:'类型描述',name:'description',
+                        editor:{type:'text'}
+                    },
+                    {display:'排序',name:'sort',width:100,type:"text",
+                        editor:{type:"text"}
+                    },
+                    {display:'状态',name:'status',
+                        editor:{type:'text'}
+                    },
+                    { display: '创建时间', name: 'createTime', width: 100,type:"date"},
+                    {display:'操作',isSort:false,width:120,render:function(rowdata,rowindex,value)
+                    {
+                        var h="";
+                        if(!rowdata._editing)
+                        {
+                            h += "<a href='javascript:category_beginEdit(" + rowindex + ")'>修改</a> ";
+                            h +="<a href='javascript:category_deleteRow("+ rowindex +")'>删除</a> " ;
+                        }
+                        else{
+                            h +="<a href='javascript:category_endEdit("+ rowindex +")'>提交</a> "  ;
+                            h +="<a href='javascript:category_cancelEdit("+ rowindex +")'>取消</a> ";
+                        }
+                        return h;
+                    }
+                    }
+                ] ,
+                enabledEdit:true,clickToEdit:false,isScroll:false,
+                data: category_gridData,
+                width:'100%'
+            }) ;
+
+
+        }
+        function category_beginEdit(rowid){
+            category_manager.beginEdit(rowid);
+        }
+        function category_cancelEdit(rowid){
+            category_manager.cancelEdit(rowid);
+        }
+        function category_endEdit(rowid){
+            category_manager.endEdit(rowid);
+            var row=category_manager.getRow(rowid);
+            var jsonString= $.toJSON(row);
+            $.post("../"+$.URL.category.update,{"jsonString":jsonString},category_updateCallBack,"json");
+        }
+        function category_updateCallBack(data){
+            $.post("../"+$.URL.category.findByCondition,{"jsonString":"{}"},category_listCallback,"json");
+            if(data.code==200){
+                $.ligerDialog.success("修改成功") ;
+            }
+            else{
+                $.ligerDialog.error(data.message);
+            }
+        }
+        function category_deleteRow(rowid){
+            if(confirm("确认删除？"))
+            {
+                var row=category_manager.getRow(rowid);
+                var jsonString= $.toJSON(row);
+                $.post("../"+$.URL.category.delete,{"jsonString":jsonString},category_deleteCallBack,"json");
+                category_manager.deleteRow(rowid);
+            }
+        }
+        function category_deleteCallBack(data){
+            if(data.code==200)
+            {
+                $.ligerDialog.success("成功删除！");
+            }
+            else{
+                $.ligerDialog.error("删除失败！");
+            }
+        }
+        $("#categoryAddSubmitBtn").click(function(){
+            document.getElementById('form1').reset();
+            category_f_show();
+            $.ligerDialog.open({title:'添加类型', target: $("#addDeviceType"),width:500});
+        });
+
+        function category_f_show(){
+            $('#addDeviceType').css('display','block');
+        }
+
+        $("#categorySubmitBtn").click(function(){
+            var data = {};          //左边字段和数据库字段一样，右边字段和当前页面中table标签中的Id一样
+            data.name=$("#categoryName").val();
+            data.sort=$("#categorySort").val();
+            data.status=$("#categoryStatus").val();
+            data.description=$("#categoryDescription").val();
+            $.post("../"+$.URL.category.add,{"jsonString": $.toJSON(data)},category_addCallBack,"json"); //将前台数据以json格式通过设置的URL发送到web后台
+        });
+
+        function category_addCallBack(data){
+            if(data.code==200){
+                $.ligerDialog.success('操作成功');
+                $.post("../"+$.URL.category.findByCondition,{"jsonString":"{}"},category_listCallback,"json");
+            }
+            else
+            {
+                $.ligerDialog.error(data.message);
+            }
+        }
+
+    </script>
+    <style type="text/css">
+        .l-table-edit {}
+        .l-table-edit-td{ padding:4px;}
+        .l-button-submit,.l-button-reset{width:80px; float:left; margin-left:10px; padding-bottom:2px;}
+        .l-dialog-tc{background:#E0EDFF; }
+    </style>
+</head>
+<body  style="padding:10px">
+<div id="addDeviceType" style="display: none">
+    <form name="form1" method="post" action="" id="form1">
+        <div>
+        </div>
+        <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+            <tr>
+                <td align="right" class="l-table-edit-td">类型名称:</td>
+                <td align="left" class="l-table-edit-td"><input name="categoryName" type="text" id="categoryName" ltype="text" /></td>
+                <td align="left"></td>
+            </tr>
+
+            <tr>
+                <td align="right" class="l-table-edit-td">排序:</td>
+                <td align="left" class="l-table-edit-td"><input name="categorySort" type="text"  id="categorySort" ltype="text"></td>
+                <td align="left"></td>
+            </tr>
+
+            <tr>
+                <td align="right" class="l-table-edit-td">状态:</td>
+                <td align="left" class="l-table-edit-td">
+                    <select id="categoryStatus" name="categoryStatus">
+                        <option value="1">正常</option>
+                        <option value="0">关闭</option>
+                    </select>
+                </td>
+                <td align="left"></td>
+            </tr>
+
+            <tr>
+                <td align="right" class="l-table-edit-td">描述:</td>
+                <td align="left" class="l-table-edit-td"><textarea name="categoryDescription" type="text" id="categoryDescription" cols="20" rows="2" class="l-textarea" style="width:400px"></textarea>
+                </td><td align="left"></td>
+            </tr>
+        </table>
+        <br />
+        <input type="button" value="提交" id="categorySubmitBtn" class="l-button l-button-submit" />
+    </form>
+</div>
+<div id="list">
+    <div><input type="button" value="添加" id="categoryAddSubmitBtn" class="l-button l-button-submit" /></div>
+    <div class="l-clear"></div>
+    <div id="category_maingrid" style="margin-top:20px"></div> <br />
+</div>
+<div style="display:none;">
+    <!-- g data total ttt -->
+</div>
+</body>
+</html>

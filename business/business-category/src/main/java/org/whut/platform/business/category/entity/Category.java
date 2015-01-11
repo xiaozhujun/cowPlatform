@@ -13,7 +13,7 @@ public class Category {
     private Long id;
     private String name;
     private String description;
-    private int index;
+    private int sort;
     private int status;
     private Date createTime;
     private Long appId;
@@ -42,12 +42,12 @@ public class Category {
         this.description = description;
     }
 
-    public int getIndex() {
-        return index;
+    public int getSort() {
+        return sort;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 
     public int getStatus() {
