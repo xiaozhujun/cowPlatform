@@ -163,7 +163,13 @@
                 $("#templateCategory").ligerComboBox({emptyText:null,   //实现下拉框
                     data:templateCategoryList,
                     valueFieldID: 'templateCategoryId',
-                    label:'选择合同',labelWidth:200,labelAlign:'center'
+                    label:'选择类型',labelWidth:200,labelAlign:'center'
+                });
+
+                $("#templateSearch_categoryId").ligerComboBox({emptyText:null,   //实现下拉框
+                    data:templateCategoryList,
+                    valueFieldID: 'templateSearchCategoryId',
+                    label:'选择类型',labelWidth:200,labelAlign:'center'
                 });
             }
         }
@@ -183,6 +189,19 @@
                 $.post($.URL.stockIn.list,null,stockIn_ListCallBack,"json");
             }
         }
+
+        $("#templateSearchBtn").click(function(){
+            var data={};
+            var name=$("#templateSearch_name").val();
+            var category=$("#templateSearchCategoryId").val();
+            if(name!=""){
+                data.name = name;
+            }
+            if(category!=""){
+                data.categoryId=category;
+            }
+            $.post("../"+$.URL.template.findByCondition,{"jsonString": $.toJSON(data)},template_listCallback,"json");
+        });
 
     </script>
     <style type="text/css">
@@ -262,7 +281,16 @@
 
 </div>
 <div id="list">
-    <div><input type="button" value="添加" id="templateAddSubmitBtn" class="l-button l-button-submit" /></div>
+    <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+        <tr>
+            <td align="right" class="l-table-edit-td">模板名称:</td>
+            <td align="left" class="l-table-edit-td"><input name="templateSearch_name" type="text" id="templateSearch_name" ltype="text"/></td>
+            <td align="right" class="l-table-edit-td">模板类型:</td>
+            <td align="left" class="l-table-edit-td"><input name="templateSearch_categoryId" type="text" id="templateSearch_categoryId" ltype="text" /></td>
+            <td align="right"><input type="button" value="查询" id="templateSearchBtn" class="l-button l-button-submit" /></td>
+            <td align="right"><input type="button" value="添加" id="templateAddSubmitBtn" class="l-button l-button-submit" /></td>
+        </tr>
+    </table>
     <div class="l-clear"></div>
     <div id="template_maingrid" style="margin-top:20px"></div> <br />
 </div>
