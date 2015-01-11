@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.whut.platform.business.template.entity.Template;
 import org.whut.platform.business.template.service.TemplateService;
+import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.fundamental.config.FundamentalConfigProvider;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.util.json.JsonMapper;
@@ -23,7 +24,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,9 +55,45 @@ public class TemplateServiceWeb {
         if(template.getName()==null||template.getName().trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
+        template.setCreateTime(new Date());
+        template.setAppId(UserContext.currentUserAppId());
+
         templateService.add(template);
         return JsonResultUtils.getObjectResultByStringAsDefault(template.getId(), JsonResultUtils.Code.SUCCESS);
     }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/update")
+    @POST
+    public String update(@FormParam("jsonString") String jsonString){
+        if(jsonString==null||jsonString.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        Template template = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Template.class);
+        if(template.getId()==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+
+        templateService.update(template);
+        return JsonResultUtils.getObjectResultByStringAsDefault(template.getId(), JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/delete")
+    @POST
+    public String delete(@FormParam("jsonString") String jsonString){
+        if(jsonString==null||jsonString.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        Template template = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Template.class);
+        if(template.getId()==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+
+        templateService.delete(template);
+        return JsonResultUtils.getObjectResultByStringAsDefault(template.getId(), JsonResultUtils.Code.SUCCESS);
+    }
+
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     @Path("/findByCondition")
@@ -64,15 +103,15 @@ public class TemplateServiceWeb {
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
         HashMap<String,String> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
-        HashMap<String,Object> categoryList = templateService.findByCondition(condition);
+        List<HashMap<String,Object>> categoryList = templateService.findByCondition(condition);
         return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
     }
 
     //上传模板图片
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    @Path("/uploadResource")
+    @Path("/upload")
     @POST
-    public String uploadResource(@Context HttpServletRequest request){
+    public String upload(@Context HttpServletRequest request){
         if(request==null){
             return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.ERROR);
         }
@@ -119,7 +158,7 @@ public class TemplateServiceWeb {
             template1.setId(template.getId());
             template1.setUrl(templateWebPath);
             templateService.updateResource(template1);
-            ZipUtil.upzip(templatePath,templateRootPath+"/"+templateRelativePath+"/");
+            ZipUtil.unzip(templatePath,templateRootPath+"/"+templateRelativePath+"/");
 
         } catch (IOException e) {
             logger.error(e.getMessage());

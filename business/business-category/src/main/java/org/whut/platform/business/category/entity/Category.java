@@ -1,5 +1,8 @@
 package org.whut.platform.business.category.entity;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.whut.platform.fundamental.util.json.CustomDateDeserialize;
+
 import java.util.Date;
 
 /**
@@ -15,6 +18,7 @@ public class Category {
     private String description;
     private int sort;
     private int status;
+    @JsonDeserialize(using=CustomDateDeserialize.class)
     private Date createTime;
     private Long appId;
 

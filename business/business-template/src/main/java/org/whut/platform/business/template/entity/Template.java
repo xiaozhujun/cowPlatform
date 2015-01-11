@@ -1,5 +1,8 @@
 package org.whut.platform.business.template.entity;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.whut.platform.fundamental.util.json.CustomDateDeserialize;
+
 import java.util.Date;
 
 /**
@@ -13,10 +16,12 @@ public class Template {
     private Long id;
     private String number;
     private String name;
+    private Long categoryId;
     private String description;
     private Long viewCount;
     private Long useCount;
     private int status;
+    @JsonDeserialize(using=CustomDateDeserialize.class)
     private Date createTime;
     private String url;
     private Long appId;
@@ -43,6 +48,14 @@ public class Template {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getDescription() {

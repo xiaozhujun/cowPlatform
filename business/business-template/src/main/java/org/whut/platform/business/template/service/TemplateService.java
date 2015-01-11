@@ -5,6 +5,7 @@ import org.whut.platform.business.template.entity.Template;
 import org.whut.platform.business.template.mapper.TemplateMapper;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +38,7 @@ public class TemplateService {
        templateMapper.updateResource(template);
     }
 
-    public HashMap<String,Object> findByCondition(HashMap<String,String> condition){
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition){
         return templateMapper.findByCondition(condition);
     }
 }
