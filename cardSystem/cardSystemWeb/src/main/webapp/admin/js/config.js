@@ -38,6 +38,12 @@
             "update":"rs/template/update",
             "delete":"rs/template/delete",
             "findByCondition":"rs/template/findByCondition"
+        },
+        "userTemplate":{
+            "add":"rs/userTemplate/add",
+            "update":"rs/userTemplate/update",
+            "delete":"rs/userTemplate/delete",
+            "findByCondition":"rs/userTemplate/findByCondition"
         }
     }
 })(jQuery);
