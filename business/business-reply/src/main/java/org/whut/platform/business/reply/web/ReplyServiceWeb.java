@@ -1,9 +1,10 @@
-package org.whut.platform.business.category.web;
+package org.whut.platform.business.reply.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.whut.platform.business.category.entity.Category;
-import org.whut.platform.business.category.service.CategoryService;
+import org.whut.platform.business.reply.entity.Reply;
+import org.whut.platform.business.reply.entity.ReplyStatus;
+import org.whut.platform.business.reply.service.ReplyService;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.util.json.JsonMapper;
@@ -21,17 +22,17 @@ import java.util.List;
 /**
  * Created with IntelliJ IDEA.
  * User: xiaozhujun
- * Date: 14-12-31
- * Time: 下午2:50
- * To change this category use File | Settings | File Categorys.
+ * Date: 15-1-14
+ * Time: 下午7:24
+ * To change this template use File | Settings | File Templates.
  */
 @Component
-@Path("/category")
-public class CategoryServiceWeb {
-    private static final PlatformLogger logger = PlatformLogger.getLogger(CategoryServiceWeb.class);
+@Path("/reply")
+public class ReplyServiceWeb {
+    private static final PlatformLogger logger = PlatformLogger.getLogger(ReplyServiceWeb.class);
 
     @Autowired
-    private CategoryService categoryService;
+    private ReplyService replyService;
 
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
@@ -41,14 +42,16 @@ public class CategoryServiceWeb {
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        Category category = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Category.class);
-        if(category.getName()==null||category.getName().trim().equals("")){
+        Reply reply = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Reply.class);
+        if(reply.getContent()==null||reply.getContent().trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        category.setCreateTime(new Date());
-        category.setAppId(UserContext.currentUserAppId());
+        reply.setCreateTime(new Date());
+        reply.setAppId(UserContext.currentUserAppId());
+        reply.setUserId(UserContext.currentUserId());
+        reply.setStatus(ReplyStatus.NORMAL.getValue());
 
-        categoryService.add(category);
+        replyService.add(reply);
         return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.SUCCESS);
     }
 
@@ -59,12 +62,12 @@ public class CategoryServiceWeb {
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        Category category = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Category.class);
-        if(category.getId()==null){
+        Reply reply = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Reply.class);
+        if(reply.getId()==null){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
 
-        categoryService.update(category);
+        replyService.update(reply);
         return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.SUCCESS);
     }
 
@@ -75,12 +78,12 @@ public class CategoryServiceWeb {
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        Category category = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Category.class);
-        if(category.getId()==null){
+        Reply reply = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,Reply.class);
+        if(reply.getId()==null){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
 
-        categoryService.delete(category);
+        replyService.delete(reply);
         return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.SUCCESS);
     }
 
@@ -92,7 +95,20 @@ public class CategoryServiceWeb {
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
         HashMap<String,Object> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
-       List<HashMap<String,Object>> categoryList = categoryService.findByCondition(condition);
-        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
+        List<HashMap<String,Object>> replyList = replyService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(replyList,JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/findByTargetId")
+    @POST
+    public String findByTargetId(@FormParam("targetId") Long targetId){
+        if(targetId==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("targetId",targetId);
+        List<HashMap<String,Object>> replyList = replyService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(replyList,JsonResultUtils.Code.SUCCESS);
     }
 }

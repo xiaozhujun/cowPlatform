@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.whut.platform.business.reply.mapper.ReplyMapper">
+    <sql id="reply_fields">
+		id,parentId,targetId,userId,status,createTime,content,appId
+	</sql>
+
+    <resultMap id="replyResultMap" type="reply">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parentId"/>
+        <result property="targetId" column="targetId"/>
+        <result property="userId" column="userId"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="createTime"/>
+        <result property="content" column="content"/>
+        <result property="appId" column="appId"/>
+    </resultMap>
+
+    <insert id="add" parameterType="Reply" keyProperty="id"
+            useGeneratedKeys="true">
+        INSERT INTO
+        reply(
+        <include refid="reply_fields" />
+        )
+        VALUES (#{id},#{parentId},#{targetId},#{userId},#{status},#{createTime},#{content},#{appId});
+        <selectKey resultType="long" keyProperty="id">
+            select
+            LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <select id="totalCount" parameterType="map" resultType="java.lang.Long">
+        SELECT count(id)
+        FROM reply
+    </select>
+
+
+    <update id="update" parameterType="Reply">
+        UPDATE reply
+        <set>
+            <if test="content != null">content=#{content},</if>
+            <if test="status != null">STATUS=#{status},</if>
+        </set>
+        WHERE ID = #{id};
+    </update>
+
+    <delete id="delete" parameterType="Reply">
+        DELETE FROM reply
+        <where>
+            <if test="id != null">ID=#{id}</if>
+        </where>
+    </delete>
+
+    <select id="get" parameterType="Reply" resultMap="replyResultMap">
+        SELECT
+        <include refid="reply_fields" />
+        FROM reply WHERE ID=#{id}
+    </select>
+
+     <select id="findByCondition" parameterType="map" resultType="map">
+        SELECT
+        <include refid="reply_fields"/>
+        FROM reply
+        <where>
+            <if test="userId!=null">userId=#{userId}</if>
+            <if test="targetId!=null">AND targetId=#{targetId}</if>
+            <if test="status!=null">AND STATUS=#{status}</if>
+            <if test="content!=null">AND content like CONCAT('%','${content}','%' ) </if>
+            <if test="startTime!=null"><![CDATA[ AND createTime>=#{startTime}]]></if>
+            <if test="endTime!=null"><![CDATA[ AND createTime<=#{endTime} ]]> </if>
+        </where>
+        order by createTime desc
+    </select>
+
+</mapper>

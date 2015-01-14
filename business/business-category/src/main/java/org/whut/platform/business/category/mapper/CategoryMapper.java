@@ -18,5 +18,5 @@ public interface CategoryMapper extends AbstractMapper<Category> {
     public List<Category> findByCondition(Map<String,Object> map);
     public long getIdByName(String name);
     public String getNameById(long id);
-    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition);
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,Object> condition);
 }

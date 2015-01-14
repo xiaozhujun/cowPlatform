@@ -34,7 +34,7 @@ public class CategoryService {
         return categoryMapper.get(category);
     }
 
-    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition){
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,Object> condition){
         return categoryMapper.findByCondition(condition);
     }
 
