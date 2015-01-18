@@ -14,6 +14,7 @@ public class Classmate {
     private String name;
     private String telephone;
     private String address;
+    private String company;
     private String job;
     private String jobContent;
     private String arrangement;
@@ -49,6 +50,14 @@ public class Classmate {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public String getJob() {

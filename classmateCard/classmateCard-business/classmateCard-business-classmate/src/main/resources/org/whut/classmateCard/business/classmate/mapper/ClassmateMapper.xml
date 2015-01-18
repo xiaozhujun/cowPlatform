@@ -5,18 +5,19 @@
 
 <mapper namespace="org.whut.classmateCard.business.classmate.mapper.ClassmateMapper">
     <sql id="classmate_fields">
-		id,name,telephone,address,job,jobContent,arrangement,note
+		id,name,telephone,address,company,job,jobContent,arrangement,note
 	</sql>
 
     <resultMap id="classmateResultMap" type="Classmate">
-        <id property="id" column="ID"/>
-        <result property="name" column="NAME"/>
-        <result property="telephone" column="TELEPHONE"/>
-        <result property="address" column="ADDRESS"/>
-        <result property="job" column="JOB"/>
-        <result property="jobContent" column="JOBCONTENT"/>
-        <result property="arrangement" column="ARRANGEMENT"/>
-        <result property="note" column="NOTE"/>
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="telephone" column="telephone"/>
+        <result property="address" column="address"/>
+        <result property="company" column="company"/>
+        <result property="job" column="job"/>
+        <result property="jobContent" column="jobContent"/>
+        <result property="arrangement" column="arrangement"/>
+        <result property="note" column="note"/>
     </resultMap>
 
     <insert id="add" parameterType="Classmate" keyProperty="id"
@@ -25,7 +26,7 @@
         classmate(
         <include refid="classmate_fields" />
         )
-        VALUES (#{id},#{name},#{telephone},#{address},#{job},#{jobContent},#{arrangement},#{note});
+        VALUES (#{id},#{name},#{telephone},#{address},#{company},#{job},#{jobContent},#{arrangement},#{note});
         <selectKey resultType="long" keyProperty="id">
             select
             LAST_INSERT_ID() as id
@@ -41,13 +42,14 @@
     <update id="update" parameterType="Classmate">
         UPDATE classmate
         <set>
-            <if test="name != null">NAME=#{name},</if>
-            <if test="telephone != null">TELEPHONE=#{telephone},</if>
-            <if test="address != null">ADDRESS=#{address},</if>
-            <if test="job!=null">JOB=#{job},</if>
-            <if test="jobContent!=null">JOBCONTENT=#{jobContent},</if>
-            <if test="arrangement!=null">ARRANGEMENT=#{arrangement},</if>
-            <if test="note!=null">NOTE=#{note},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="telephone != null">telephone=#{telephone},</if>
+            <if test="address != null">address=#{address},</if>
+            <if test="company != null">company=#{company},</if>
+            <if test="job!=null">job=#{job},</if>
+            <if test="jobContent!=null">jobContent=#{jobContent},</if>
+            <if test="arrangement!=null">arrangement=#{arrangement},</if>
+            <if test="note!=null">note=#{note},</if>
 
         </set>
         WHERE ID = #{id};
@@ -57,7 +59,7 @@
         DELETE FROM classmate
         <where>
             <if test="id != null">ID=#{id}</if>
-            <if test="name != null">AND NAME=#{name}</if>
+            <if test="name != null">AND name=#{name}</if>
         </where>
     </delete>
 
@@ -79,12 +81,13 @@
         FROM classmate
         <where>
             <if test="name != null">NAME=#{name}</if>
-            <if test="telephone != null"> AND dTELEPHONE=#{telephone}</if>
-            <if test="address != null"> AND ADDRESS=#{address}</if>
-            <if test="job!=null"> AND JOB=#{job}</if>
-            <if test="jobContent!=null"> AND JOBCONTENT=#{jobContent</if>
-            <if test="arrangement!=null"> AND ARRANGEMENT=#{arrangement}</if>
-            <if test="note!=null"> AND NOTE=#{note}</if>
+            <if test="telephone != null"> AND telephone=#{telephone}</if>
+            <if test="address != null"> AND address=#{address}</if>
+            <if test="company != null"> AND company=#{company}</if>
+            <if test="job!=null"> AND job=#{job}</if>
+            <if test="jobContent!=null"> AND jobContent=#{jobContent</if>
+            <if test="arrangement!=null"> AND arrangement=#{arrangement}</if>
+            <if test="note!=null"> AND note=#{note}</if>
         </where>
     </select>
 

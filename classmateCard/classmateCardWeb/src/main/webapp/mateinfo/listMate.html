@@ -30,6 +30,7 @@
         { header: '姓名', name: 'name' },
         { header: '联系电话', name: 'telephone' },
         { header: '工作城市', name: 'address' },
+        { header: '所在公司', name: 'company' },
         { header: '工作岗位', name: 'job' },
         { header: '工作内容', name: 'jobContent' },
         {header:'过年安排',name:'arrangement'},
@@ -50,13 +51,16 @@
                 {display:'工作城市',name:'address',width:"140",
                     editor:{type:'text'}
                 },
+                {display:'所在公司',name:'company', width:"140",
+                    editor:{type:'text'}
+                },
                 {display:'工作岗位',name:'job', width:"140",
                     editor:{type:'text'}
                 },
                 {display:'工作内容',name:'jobContent',width:"250",
                     editor:{type:'text'}
                 },
-                {display:'创业方向',name:'note',width:"250",
+                {display:'拟创业方向',name:'note',width:"250",
                     editor:{type:'text'}
                 },
                 {display:'过年安排',name:'arrangement',width:"250",
@@ -73,6 +77,7 @@
         $("#name").val("");
         $("#telephone").val("");
         $("#address").val("");
+        $("#company").val("");
         $("#job").val("");
         $("#jobContent").val("");
         $("#arrangement").val("");
@@ -99,6 +104,7 @@
         addData.name = $("#name").val();
         addData.telephone = $("#telephone").val();
         addData.address = $("#address").val();
+        addData.company=$("#company").val();
         addData.job = $("#job").val();
         addData.jobContent = $("#jobContent").val();
         addData.arrangement = $("#arrangement").val();
@@ -215,6 +221,11 @@
                 <td align="left"></td>
             </tr>
             <tr>
+                <td align="right" class="l-table-edit-td">所在公司:</td>
+                <td align="left" class="l-table-edit-td"><input name="company" style="width:200px" type="text" id="company" ltype="text" /></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
                 <td align="right" class="l-table-edit-td">工作岗位:</td>
                 <td align="left" class="l-table-edit-td"><input name="job" style="width:200px" type="text" id="job" ltype="text" /></td>
                 <td align="left"></td>
@@ -226,7 +237,7 @@
                 <td align="left"></td>
             </tr>
             <tr>
-                <td align="right" class="l-table-edit-td">创业方向:</td>
+                <td align="right" class="l-table-edit-td">拟创业方向:</td>
                 <td align="left" class="l-table-edit-td">
                     <textarea cols="50" rows="2" class="l-textarea" style="width: 400px"  name="note" id="note" /></textarea></td>
                 <td align="left"></td>
