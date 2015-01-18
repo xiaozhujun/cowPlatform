@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,6 +58,7 @@ public class TemplateServiceWeb {
         }
         template.setCreateTime(new Date());
         template.setAppId(UserContext.currentUserAppId());
+        template.setName(UUID.randomUUID().toString());
 
         templateService.add(template);
         return JsonResultUtils.getObjectResultByStringAsDefault(template.getId(), JsonResultUtils.Code.SUCCESS);
@@ -102,7 +104,33 @@ public class TemplateServiceWeb {
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        HashMap<String,String> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
+        HashMap<String,Object> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
+        List<HashMap<String,Object>> categoryList = templateService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/getByNumber")
+    @POST
+    public String getByNumber(@FormParam("number") String number){
+        if(number==null||number.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("number",number);
+        List<HashMap<String,Object>> categoryList = templateService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/getByCategory")
+    @POST
+    public String getByCategory(@FormParam("categoryId") Long categoryId){
+        if(categoryId==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("categoryId",categoryId);
         List<HashMap<String,Object>> categoryList = templateService.findByCondition(condition);
         return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
     }

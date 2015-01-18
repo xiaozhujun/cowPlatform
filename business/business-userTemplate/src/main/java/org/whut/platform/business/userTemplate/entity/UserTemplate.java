@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class UserTemplate {
     private Long id;
+    private String number;
     private Long userId;
     private Long templateId;
     private String mongoId;
@@ -25,6 +26,14 @@ public class UserTemplate {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public Long getUserId() {

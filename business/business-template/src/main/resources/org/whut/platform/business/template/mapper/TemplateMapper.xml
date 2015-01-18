@@ -86,7 +86,7 @@
         <include refid="template_fields"/>
         FROM template
         <where>
-            <if test="name!=null">name=#{name}</if>
+            <if test="name!=null">name like CONCAT('%','${name}','%' ) </if>
             <if test="number!=null">AND number=#{number}</if>
             <if test="description!=null">AND description=#{description}</if>
             <if test="status!=null">AND status=#{status}</if>

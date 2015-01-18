@@ -19,5 +19,5 @@ public interface TemplateMapper  extends AbstractMapper<Template> {
     public long getIdByName(String name);
     public String getNameById(long id);
     public void updateResource(Template template);
-    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition);
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,Object> condition);
 }

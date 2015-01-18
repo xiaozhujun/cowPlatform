@@ -38,7 +38,7 @@ public class TemplateService {
        templateMapper.updateResource(template);
     }
 
-    public List<HashMap<String,Object>> findByCondition(HashMap<String,String> condition){
+    public List<HashMap<String,Object>> findByCondition(HashMap<String,Object> condition){
         return templateMapper.findByCondition(condition);
     }
 }

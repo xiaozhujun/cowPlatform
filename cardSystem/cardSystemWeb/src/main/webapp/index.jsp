@@ -1,5 +1,5 @@
 <html>
 <body>
-<h2>Hello zoudie!</h2>
+<h2>Hello card!</h2>
 </body>
 </html>

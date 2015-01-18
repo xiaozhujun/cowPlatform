@@ -4,11 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.whut.platform.business.userTemplate.mapper.UserTemplateMapper">
     <sql id="user_template_fields">
-		id,userId,templateId,mongoId,createTime,status,viewCount,appId
+		id,number,userId,templateId,mongoId,createTime,status,viewCount,appId
 	</sql>
 
     <resultMap id="user_templateResultMap" type="UserTemplate">
         <id property="id" column="id" />
+        <result property="number" column="number"/>
         <result property="userId" column="userId" />
         <result property="templateId" column="templateId" />
         <result property="mongoId" column="mongoId"/>
@@ -24,7 +25,7 @@
         user_template(
         <include refid="user_template_fields" />
         )
-        VALUES (#{id}, #{userId},#{templateId},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
+        VALUES (#{id},#{number},#{userId},#{templateId},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
         <selectKey resultType="long" keyProperty="id">
             select
             LAST_INSERT_ID() as id
@@ -68,6 +69,7 @@
         LEFT JOIN category ON template.categoryId=category.id
         <where>
             <if test="userId!=null"> user_template.userId=#{userId}</if>
+            <if test="number!=null">AND user_template.number=#{number}</if>
             <if test="categoryId!=null">AND category.id=#{categoryId}</if>
             <if test="categoryName!=null">AND template.name like CONCAT('%','${categoryName}','%' ) </if>
             <if test="templateId!=null">AND user_template.templateId=#{templateId}</if>

@@ -1,5 +1,6 @@
 package org.whut.platform.business.userTemplate.web;
 
+import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.whut.platform.business.user.security.UserContext;
@@ -16,10 +17,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,6 +50,7 @@ public class UserTemplateServiceWeb {
         userTemplate.setCreateTime(new Date());
         userTemplate.setStatus(UserTemplateStatus.NORMAL.getValue());
         userTemplate.setAppId(UserContext.currentUserAppId());
+        userTemplate.setNumber(UUID.randomUUID().toString());
         userTemplate.setViewCount(0);
 
         MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
@@ -95,6 +94,24 @@ public class UserTemplateServiceWeb {
     }
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/getByNumber")
+    @POST
+    public String getByNumber(@FormParam("number") String number){
+        if(number==null||number.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("number",number);
+        List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
+        if(userTemplateList.size()>0){
+            MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+            DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
+            return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+        }
+        return JsonResultUtils.getObjectResultByStringAsDefault("操作错误",JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     @Path("/findByCondition")
     @POST
     public String findByCondition(@FormParam("jsonString") String jsonString){
@@ -103,7 +120,7 @@ public class UserTemplateServiceWeb {
         }
         HashMap<String,Object> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
         List<Map<String,Object>> categoryList = userTemplateService.findByCondition(condition);
-        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
+        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.ERROR);
     }
 
 }
