@@ -280,7 +280,7 @@ public class MailSender implements InitializingBean {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
         mailSenderImpl.setHost(FundamentalConfigProvider
                 .get(Constants.SMTP_HOST));
-        mailSenderImpl.setPort(Integer.parseInt(FundamentalConfigProvider.get(Constants.SMTP_PORT)));
+        mailSenderImpl.setPort(Integer.parseInt(FundamentalConfigProvider.get(Constants.SMTP_PORT).trim()));
         mailSenderImpl.setUsername(FundamentalConfigProvider
                 .get(Constants.SMTP_USERNAME));
         mailSenderImpl.setPassword(FundamentalConfigProvider

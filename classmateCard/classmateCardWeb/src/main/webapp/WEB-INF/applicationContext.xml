@@ -26,7 +26,7 @@
     <!-- transaction manager, use JtaTransactionManager for global tx -->
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="classmatecard" />
+        <property name="dataSource" ref="whut" />
     </bean>
 
     <!-- 使用annotation定义事务 -->
@@ -39,7 +39,7 @@
 
     <!-- define the SqlSessionFactory -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="classmatecard" />
+        <property name="dataSource" ref="whut" />
         <property name="typeAliasesPackage" value="org.whut.classmateCard.business,org.whut.platform.business" />
     </bean>
 

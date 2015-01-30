@@ -19,6 +19,7 @@
         <module>business-category</module>
         <module>business-userTemplate</module>
         <module>business-reply</module>
+        <module>business-resource</module>
     </modules>
 
 </project>

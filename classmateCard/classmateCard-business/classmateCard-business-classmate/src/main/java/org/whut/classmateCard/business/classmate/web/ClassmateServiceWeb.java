@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.whut.classmateCard.business.classmate.entity.Classmate;
 import org.whut.classmateCard.business.classmate.service.ClassmateService;
 import org.whut.platform.fundamental.logger.PlatformLogger;
+import org.whut.platform.fundamental.mail.MailSender;
 import org.whut.platform.fundamental.util.json.JsonMapper;
 import org.whut.platform.fundamental.util.json.JsonResultUtils;
 
@@ -31,6 +32,9 @@ public class ClassmateServiceWeb {
     @Autowired
     private ClassmateService classmateService;
 
+    @Autowired
+    private MailSender mailSender;
+
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     @Path("/add")
@@ -44,6 +48,7 @@ public class ClassmateServiceWeb {
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
         classmateService.add(classmate);
+        mailSender.sendMail("346012526@qq.com", "08理工计研会通讯录："+classmate.getName(), jsonString);
         return JsonResultUtils.getObjectResultByStringAsDefault(classmate.getId(), JsonResultUtils.Code.SUCCESS);
     }
 

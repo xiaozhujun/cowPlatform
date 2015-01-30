@@ -58,7 +58,7 @@ public class TemplateServiceWeb {
         }
         template.setCreateTime(new Date());
         template.setAppId(UserContext.currentUserAppId());
-        template.setName(UUID.randomUUID().toString());
+        template.setNumber(UUID.randomUUID().toString());
 
         templateService.add(template);
         return JsonResultUtils.getObjectResultByStringAsDefault(template.getId(), JsonResultUtils.Code.SUCCESS);
@@ -165,7 +165,7 @@ public class TemplateServiceWeb {
         Template template = templateService.getById(tempTemplate);
         String templateName = template.getName();
         String templatePath =  templateUploadPath+"/"+templateName+"."+suffix;
-        String templateWebPath = templateRelativePath+"/"+templateName;
+        String templateWebPath = templateRelativePath+"/"+template.getNumber();
 
 
         //如果文件存在则删除
@@ -186,7 +186,7 @@ public class TemplateServiceWeb {
             template1.setId(template.getId());
             template1.setUrl(templateWebPath);
             templateService.updateResource(template1);
-            ZipUtil.unzip(templatePath,templateRootPath+"/"+templateRelativePath+"/");
+            ZipUtil.unzip(templatePath,templateRootPath+"/"+templateRelativePath+"/"+template.getNumber());
 
         } catch (IOException e) {
             logger.error(e.getMessage());

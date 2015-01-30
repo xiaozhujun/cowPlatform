@@ -9,5 +9,9 @@
     <bean id="classmatecard" class="platform.fundamental.datasource.DbcpFactoryBean">
         <property name="dbname" value="classmatecard"></property>
     </bean>
+
+    <bean id="whut" class="platform.fundamental.datasource.DbcpFactoryBean">
+        <property name="dbname" value="whut"></property>
+    </bean>
     
 </beans>

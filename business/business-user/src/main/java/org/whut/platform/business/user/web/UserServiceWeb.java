@@ -101,6 +101,27 @@ public class UserServiceWeb {
     }
 
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Path("/isLogin")
+    @GET
+    public String  isLogin(@Context HttpServletRequest request){
+        Object username = request.getSession(true).getAttribute("SPRING_SECURITY_LAST_USERNAME");
+        if(username==null){
+            return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.ERROR);
+        }
+        logger.info("current user is "+username);
+        User user;
+        try {
+            user = userService.findByEmail((String)username);
+            user.setPassword("");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.ERROR);
+        }
+        return JsonResultUtils.getObjectResultByStringAsDefault(user,JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/currentUser")
     @GET
     public String  currentUser(){

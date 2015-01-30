@@ -4,6 +4,7 @@ import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 
 public class FundamentalConfigProvider {
@@ -146,9 +147,12 @@ public class FundamentalConfigProvider {
                             .substring(CLASSPATH_PREFIX.length());
                     inputStream = FundamentalConfigProvider.class
                             .getResourceAsStream(configPath);
+                    LOGGER.info("configPath: "+configPath);
                     configs.load(inputStream);
+
                 }
                 FundamentalConfigProvider.prop = configs;
+                logConfigContent(prop);
             } catch (FileNotFoundException e) {
                 LOGGER.error("", e);
             } catch (IOException e) {
@@ -162,6 +166,16 @@ public class FundamentalConfigProvider {
         LOGGER.info("FundamentalConfigProvider.prop ={},size:{}",
                 FundamentalConfigProvider.prop,
                 FundamentalConfigProvider.prop.size());
+    }
+
+    private static void logConfigContent(Properties prop){
+       if(prop!=null){
+           for (Map.Entry entry:prop.entrySet()){
+               LOGGER.info("hello: "+entry.getKey()+"="+entry.getValue());
+           }
+       }else{
+           LOGGER.info("hello: properties is null!");
+       }
     }
 
 }

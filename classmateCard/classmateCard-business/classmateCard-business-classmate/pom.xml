@@ -80,6 +80,12 @@
 
         <dependency>
             <groupId>cowPlatform</groupId>
+            <artifactId>fundamental-mail</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cowPlatform</groupId>
             <artifactId>fundamental-util</artifactId>
             <version>${project.version}</version>
         </dependency>
