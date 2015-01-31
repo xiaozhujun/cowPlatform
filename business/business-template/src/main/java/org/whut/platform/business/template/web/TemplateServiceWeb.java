@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.whut.platform.business.category.service.CategoryService;
 import org.whut.platform.business.template.entity.Template;
 import org.whut.platform.business.template.service.TemplateService;
 import org.whut.platform.business.user.security.UserContext;
@@ -16,10 +17,7 @@ import org.whut.platform.fundamental.util.json.JsonResultUtils;
 import org.whut.platform.fundamental.util.zip.ZipUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -43,6 +41,9 @@ public class TemplateServiceWeb {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    private CategoryService categoryService;
 
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
@@ -106,6 +107,21 @@ public class TemplateServiceWeb {
         }
         HashMap<String,Object> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
         List<HashMap<String,Object>> categoryList = templateService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/getWithCategory")
+    @GET
+    public String getWithCategory(){
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        List<HashMap<String,Object>> categoryList = categoryService.findByCondition(condition);
+        for(HashMap<String,Object> category:categoryList){
+            HashMap<String,Object> categoryCondition = new HashMap<String, Object>();
+            condition.put("categoryId",category.get("categoryId"));
+            List<HashMap<String,Object>> templateList = templateService.findByCondition(categoryCondition);
+            category.put("templateList",templateList);
+        }
         return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.SUCCESS);
     }
 

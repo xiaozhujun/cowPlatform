@@ -44,12 +44,12 @@ public class UserInfoFiler implements Filter {
             }
 
             if(userDetail==null){
-                response.getWriter().write("{code:500,msg:false}");
-                logger.info("{code:500,msg:false}");
+                response.getWriter().write("{\"code\":500,\"msg\":\"false\"}");
+                logger.info("{\"code\":500,\"msg\":\"false\"}");
 
             }else {
-                response.getWriter().write("{code:200,msg:{'username':'"+userDetail.getUserName()+"'}}");
-                logger.info("{code:200,msg:{'username':'"+userDetail.getUserName()+"'}}");
+                response.getWriter().write("{\"code\":200,\"msg\":{\"username\":\""+userDetail.getUserName()+"\"}}");
+                logger.info("{\"code\":200,\"msg\":{\"username\":\""+userDetail.getUserName()+"\"}}");
             }
             response.getWriter().flush();
             response.getWriter().close();
