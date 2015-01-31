@@ -34,7 +34,7 @@ public class UserInfoFiler implements Filter {
         String targetURL = currentURL.substring(currentURL.indexOf("/", 1),
                 currentURL.length()); // 截取到当前文件名用于比较
         logger.info("targetUrl: "+targetURL);
-        if ("/rs/user/isLogin".equals(targetURL)) {
+        if ("/rs/user/isLogin".equals(targetURL)||"/j_spring_security_check".equals(targetURL)) {
             response.setHeader("Content-type","application/json;charset=UTF-8");
             MyUserDetail userDetail = null;
             try{

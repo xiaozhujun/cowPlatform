@@ -7,6 +7,9 @@ package org.whut.platform.business.user.security;
  * Time: 下午2:17
  * To change this template use File | Settings | File Templates.
  */
+import org.whut.platform.fundamental.exception.BusinessException;
+import org.whut.platform.fundamental.logger.PlatformLogger;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -19,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class CaptchaFilter implements Filter{
+
+    private static final PlatformLogger logger = PlatformLogger.getLogger(CaptchaFilter.class);
 
     @Override
     public void destroy() {
@@ -38,7 +43,13 @@ public class CaptchaFilter implements Filter{
         if(yanzhengm.equals(sessionyanz)){
             arg2.doFilter(request, response);
         }else{
-            response.sendRedirect("login.jsp?error=2");
+            response.setHeader("Content-type", "application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":501,\"msg\":\"验证码错误\"}");
+            logger.info("{\"code\":501,\"msg\":\"验证码错误\"}");
+
+            response.getWriter().flush();
+            response.getWriter().close();
+            return;
         }
     }
 
