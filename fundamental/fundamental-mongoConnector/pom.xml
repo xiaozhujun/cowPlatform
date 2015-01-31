@@ -11,17 +11,17 @@
     <artifactId>fundamental-mongoConnector</artifactId>
     <dependencies>
         <dependency>
-            <groupId>platform</groupId>
+            <groupId>cowPlatform</groupId>
             <artifactId>fundamental-config</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>platform</groupId>
+            <groupId>cowPlatform</groupId>
             <artifactId>fundamental-logger</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>platform</groupId>
+            <groupId>cowPlatform</groupId>
             <artifactId>fundamental-exception</artifactId>
             <version>${project.version}</version>
         </dependency>
