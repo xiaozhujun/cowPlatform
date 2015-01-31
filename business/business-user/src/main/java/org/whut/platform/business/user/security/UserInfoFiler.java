@@ -35,6 +35,7 @@ public class UserInfoFiler implements Filter {
                 currentURL.length()); // 截取到当前文件名用于比较
         logger.info("targetUrl: "+targetURL);
         if ("/rs/user/isLogin".equals(targetURL)) {
+            response.setHeader("Content-type","application/json;charset=UTF-8");
             MyUserDetail userDetail = null;
             try{
                 userDetail = UserContext.currentUser();
