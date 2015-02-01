@@ -118,7 +118,7 @@ public class TemplateServiceWeb {
         List<HashMap<String,Object>> categoryList = categoryService.findByCondition(condition);
         for(HashMap<String,Object> category:categoryList){
             HashMap<String,Object> categoryCondition = new HashMap<String, Object>();
-            condition.put("categoryId",category.get("categoryId"));
+            categoryCondition.put("categoryId",category.get("id"));
             List<HashMap<String,Object>> templateList = templateService.findByCondition(categoryCondition);
             category.put("templateList",templateList);
         }

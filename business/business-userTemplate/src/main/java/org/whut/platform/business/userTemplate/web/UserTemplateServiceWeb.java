@@ -1,8 +1,10 @@
 package org.whut.platform.business.userTemplate.web;
 
 import com.mongodb.DBObject;
+import org.apache.tools.ant.taskdefs.Get;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.whut.platform.business.user.security.MyUserDetail;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.userTemplate.entity.UserTemplate;
 import org.whut.platform.business.userTemplate.entity.UserTemplateStatus;
@@ -12,10 +14,7 @@ import org.whut.platform.fundamental.mongo.connector.MongoConnector;
 import org.whut.platform.fundamental.util.json.JsonMapper;
 import org.whut.platform.fundamental.util.json.JsonResultUtils;
 
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.*;
 
@@ -121,6 +120,19 @@ public class UserTemplateServiceWeb {
         HashMap<String,Object> condition = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
         List<Map<String,Object>> categoryList = userTemplateService.findByCondition(condition);
         return JsonResultUtils.getObjectResultByStringAsDefault(categoryList,JsonResultUtils.Code.ERROR);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/getByUser")
+    @GET
+    public String getByUser(){
+        MyUserDetail user = UserContext.currentUser();
+        if(user==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("您还没有登录！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
+        return JsonResultUtils.getObjectResultByStringAsDefault(userTemplateList,JsonResultUtils.Code.ERROR);
     }
 
 }
