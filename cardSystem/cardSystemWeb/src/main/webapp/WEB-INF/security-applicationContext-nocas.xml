@@ -13,6 +13,8 @@
     <http pattern="/rs/user/activate/**" security="none"/>
     <http pattern="/rs/user/prepareRetrievePwd" security="none"/>
     <http pattern="/rs/user/retrievePwd" security="none"/>
+    <http pattern="/rs/template/**" security="none"/>
+    <http pattern="/rs/userTemplate/**" security="none"/>
 
     <!-- 以下文件不检查权限 -->
     <http  auto-config="true"><!-- 访问权限 -->
@@ -21,9 +23,15 @@
         <custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="myFilter" />
         <form-login login-page="/login.jsp"
                     authentication-failure-url="/login.jsp?error=1"
+                    authentication-success-handler-ref="myAuthenticationSuccessHandler"
+                    authentication-failure-handler-ref="myAuthenticationFailureHandler"
                     login-processing-url="/j_spring_security_check"/>
         <logout logout-url="/logout"/>
     </http>
+
+    <beans:bean id="myAuthenticationFailureHandler" class="org.whut.platform.business.user.security.MyAuthenticationFailureHandler"/>
+
+    <beans:bean id="myAuthenticationSuccessHandler" class="org.whut.platform.business.user.security.MyAuthenticationSuccessHandler"/>
 
     <beans:bean id="userInfoFilter" class="org.whut.platform.business.user.security.UserInfoFiler"/>
 
