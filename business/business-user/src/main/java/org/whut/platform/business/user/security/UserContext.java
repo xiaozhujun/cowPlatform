@@ -20,7 +20,7 @@ public class UserContext {
         if(credential instanceof UserDetails){
             return (MyUserDetail)credential;
         }else{
-            throw new BusinessException(new Exception("用户初始化异常"));
+            return null;
         }
     }
 

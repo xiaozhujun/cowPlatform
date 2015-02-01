@@ -13,7 +13,10 @@
     <http pattern="/rs/user/activate/**" security="none"/>
     <http pattern="/rs/user/prepareRetrievePwd" security="none"/>
     <http pattern="/rs/user/retrievePwd" security="none"/>
-    <http pattern="/rs/template/**" security="none"/>
+    <http pattern="/rs/template/getWithCategory" security="none"/>
+    <http pattern="/rs/template/findByCondition" security="none"/>
+    <http pattern="/rs/template/getByNumber" security="none"/>
+    <http pattern="/rs/template/getByCategory" security="none"/>
     <http pattern="/rs/userTemplate/**" security="none"/>
 
     <!-- 以下文件不检查权限 -->
