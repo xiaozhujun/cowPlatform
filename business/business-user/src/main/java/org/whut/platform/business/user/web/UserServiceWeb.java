@@ -204,7 +204,9 @@ public class UserServiceWeb {
         user.setAppId(1L);
         userService.add(user);
         mailSender.sendMail(email, "注册激活邮件--喜出望外", "请您激活！"+"<a href='http://localhost:8080/cardSystem/rs/user/activate/"+user.getEmail()+"/"+user.getActivateCode()+"'>激活</a>");
-        return "恭喜您，注册成功！激活邮件已发到您的邮箱："+email+",请您进入邮箱激活！";
+
+        return JsonResultUtils.getObjectResultByStringAsDefault("注册成功！",JsonResultUtils.Code.SUCCESS);
+//        return "恭喜您，注册成功！激活邮件已发到您的邮箱："+email+",请您进入邮箱激活！";
 
     }
 
@@ -234,7 +236,8 @@ public class UserServiceWeb {
         user.setEmail(email);
         user.setStatus(UserStatus.REGIST.getValue());
         userService.activate(user);
-        return "恭喜您，用户已激活！";
+        return JsonResultUtils.getObjectResultByStringAsDefault("恭喜您，用户已激活！",JsonResultUtils.Code.SUCCESS);
+//        return "恭喜您，用户已激活！";
     }
 
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -262,7 +265,8 @@ public class UserServiceWeb {
         user.setEmail(email);
         userService.prepareRetrievePwd(user);
         mailSender.sendMail(email, "密码修改--喜出望外", "请您点击链接修改密码！"+"<a href='http://localhost:8080/cardSystem/resetPwd.jsp?email="+user.getEmail()+"&retrievePwdCode="+user.getRetrievePwdCode()+"'>修改密码</a>");
-        return "恭喜您，密码重置邮件已发到您的邮箱："+email+",请您进入邮箱修改密码！";
+        return JsonResultUtils.getObjectResultByStringAsDefault("恭喜您，密码重置邮件已发到您的邮箱：\"+email+\",请您进入邮箱修改密码！",JsonResultUtils.Code.SUCCESS);
+//        return "恭喜您，密码重置邮件已发到您的邮箱："+email+",请您进入邮箱修改密码！";
     }
 
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -283,7 +287,8 @@ public class UserServiceWeb {
         user.setEmail(email);
         user.setPassword(password);
         userService.retrievePwd(user);
-        return "恭喜您，密码重置成功！";
+        return JsonResultUtils.getObjectResultByStringAsDefault("恭喜您，密码重置成功！",JsonResultUtils.Code.SUCCESS);
+//        return "恭喜您，密码重置成功！";
     }
 
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
