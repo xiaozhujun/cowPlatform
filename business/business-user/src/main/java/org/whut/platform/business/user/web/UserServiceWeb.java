@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -175,10 +176,19 @@ public class UserServiceWeb {
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/add")
     @POST
-    public String add(@FormParam("username") String username,@FormParam("email") String email,@FormParam("password") String password){
-
-        if(username==null||username.trim().equals("")||email==null||email.trim().equals("")||password==null||password.trim().equals("")){
+    public String add(@FormParam("jsonString") String jsonString){
+        if(jsonString==null||jsonString.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> params = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
+        String email = (String)params.get("email");
+        String password=(String)params.get("password");
+        Boolean isAgree = (Boolean)params.get("isAgree");
+        if(email==null||email.trim().equals("")||password==null||password.trim().equals("")){
             return JsonResultUtils.getCodeAndMesByString(JsonResultUtils.Code.ERROR.getCode(), "参数不能为空!");
+        }
+        if(isAgree==null||!isAgree){
+            return JsonResultUtils.getCodeAndMesByString(JsonResultUtils.Code.ERROR.getCode(), "对不起，您没有接受使用协议!");
         }
         if(userService.isEmailExist(email)){
             return JsonResultUtils.getCodeAndMesByString(JsonResultUtils.Code.ERROR.getCode(), "邮箱已存在!");
@@ -186,7 +196,6 @@ public class UserServiceWeb {
         User user = new User();
 
         user.setPassword(password);
-        user.setName(username);
         user.setEmail(email);
         user.setStatus(UserStatus.REGIST.getValue());
         user.setCreateTime(new Date());

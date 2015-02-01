@@ -27,6 +27,7 @@
                     authentication-failure-handler-ref="myAuthenticationFailureHandler"
                     login-processing-url="/j_spring_security_check"/>
         <logout logout-url="/logout"/>
+        <remember-me/>
     </http>
 
     <beans:bean id="myAuthenticationFailureHandler" class="org.whut.platform.business.user.security.MyAuthenticationFailureHandler"/>
@@ -60,7 +61,7 @@
 15	        specify an Id Even though the authenticationManager is created by
 16	        default when namespace based config is used.
 17	    -->
-    <authentication-manager alias="authenticationManager">
+    <authentication-manager alias="authenticationManager"  erase-credentials="false">
         <authentication-provider
                 user-service-ref="myUserDeatailsService">
             <password-encoder hash="md5" />
