@@ -41,10 +41,13 @@ public class UserTemplateServiceWeb {
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
-        UserTemplate userTemplate = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,UserTemplate.class);
-        if(userTemplate.getTemplateId()==null){
-            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        HashMap<String,Object> params = JsonMapper.buildNonDefaultMapper().fromJson(jsonString,HashMap.class);
+
+        if(params.get("templateNumber")==null){
+            return JsonResultUtils.getObjectResultByStringAsDefault("模板编号不能为空！", JsonResultUtils.Code.ERROR);
         }
+        UserTemplate userTemplate = new UserTemplate();
+        userTemplate.setTemplateNumber((String)params.get("templateNumber"));
         userTemplate.setUserId(UserContext.currentUserId());
         userTemplate.setCreateTime(new Date());
         userTemplate.setStatus(UserTemplateStatus.NORMAL.getValue());
@@ -131,8 +134,9 @@ public class UserTemplateServiceWeb {
             return JsonResultUtils.getObjectResultByStringAsDefault("您还没有登录！", JsonResultUtils.Code.ERROR);
         }
         HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("userId",user.getId());
         List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
-        return JsonResultUtils.getObjectResultByStringAsDefault(userTemplateList,JsonResultUtils.Code.ERROR);
+        return JsonResultUtils.getObjectResultByStringAsDefault(userTemplateList,JsonResultUtils.Code.SUCCESS);
     }
 
 }

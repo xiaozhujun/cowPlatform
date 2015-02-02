@@ -1,10 +1,17 @@
 package org.whut.platform.business.user.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -14,6 +21,7 @@ import org.whut.platform.business.user.entity.User;
 import org.whut.platform.business.user.entity.UserAuthority;
 import org.whut.platform.business.user.entity.UserStatus;
 import org.whut.platform.business.user.security.MD5Encoder;
+import org.whut.platform.business.user.security.MyUserDetailsService;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.user.service.AuthorityService;
 import org.whut.platform.business.user.service.UserAuthorityService;
@@ -25,6 +33,7 @@ import org.whut.platform.fundamental.util.RandomStringUtil;
 import org.whut.platform.fundamental.util.json.JsonMapper;
 import org.whut.platform.fundamental.util.json.JsonResultUtils;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -176,7 +185,7 @@ public class UserServiceWeb {
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
     @Path("/add")
     @POST
-    public String add(@FormParam("jsonString") String jsonString){
+    public String add(@FormParam("jsonString") String jsonString,@Context HttpServletRequest request,@Context ServletContext sc){
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
@@ -205,11 +214,53 @@ public class UserServiceWeb {
         userService.add(user);
         mailSender.sendMail(email, "注册激活邮件--喜出望外", "请您激活！"+"<a href='http://localhost:8080/cardSystem/rs/user/activate/"+user.getEmail()+"/"+user.getActivateCode()+"'>激活</a>");
 
+        autoLogin(email,password,request,sc);
+
         return JsonResultUtils.getObjectResultByStringAsDefault("注册成功！",JsonResultUtils.Code.SUCCESS);
 //        return "恭喜您，注册成功！激活邮件已发到您的邮箱："+email+",请您进入邮箱激活！";
 
     }
 
+    private boolean autoLogin(String userName, String password,HttpServletRequest request,ServletContext sc) {
+        try {
+            WebApplicationContext webApplicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
+            AuthenticationManager authenticationManager = (AuthenticationManager)webApplicationContext.getBean("org.springframework.security.authenticationManager");
+            //Provides User information. Its a Spring interface : org.springframework.security.core.userdetails.UserDetails
+            MyUserDetailsService userDetailsService = (MyUserDetailsService)webApplicationContext.getBean("myUserDetailsService");
+            UserDetails userDetails = userDetailsService
+                    .loadUserByUsername(userName);
+            //Create a token using spring provided class : org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    userName, password,
+                    userDetails.getAuthorities());
+
+            // generate session if one doesn't exist
+            request.getSession();
+
+            //save details as WebAuthenticationDetails records the remote address and will also set the session Id if a session already exists (it won't create one).
+            token.setDetails(new WebAuthenticationDetails(request));
+
+            //authenticationManager injected as spring bean, you can use custom or spring provided authentication manager
+            Authentication authentication = authenticationManager
+                    .authenticate(token);
+
+            //Need to set this as thread locale as available throughout
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
+
+            //Set SPRING_SECURITY_CONTEXT attribute in session as Spring identifies context through this attribute
+            request.getSession()
+                    .setAttribute(
+                            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                            SecurityContextHolder.getContext());
+
+        } catch (Exception e) {
+            SecurityContextHolder.getContext().setAuthentication(null);
+            logger.error("Exception", e);
+            return false;
+        }
+        return true;
+    }
 
 
     @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")

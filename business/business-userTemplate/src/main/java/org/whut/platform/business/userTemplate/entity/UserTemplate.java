@@ -14,6 +14,7 @@ public class UserTemplate {
     private String number;
     private Long userId;
     private Long templateId;
+    private String templateNumber;
     private String mongoId;
     private Date createTime;
     private Integer status;
@@ -50,6 +51,14 @@ public class UserTemplate {
 
     public void setTemplateId(Long templateId) {
         this.templateId = templateId;
+    }
+
+    public String getTemplateNumber() {
+        return templateNumber;
+    }
+
+    public void setTemplateNumber(String templateNumber) {
+        this.templateNumber = templateNumber;
     }
 
     public String getMongoId() {
