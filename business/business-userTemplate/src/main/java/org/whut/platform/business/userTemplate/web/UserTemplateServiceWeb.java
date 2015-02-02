@@ -50,7 +50,7 @@ public class UserTemplateServiceWeb {
         userTemplate.setTemplateNumber((String)params.get("templateNumber"));
         userTemplate.setUserId(UserContext.currentUserId());
         userTemplate.setCreateTime(new Date());
-        userTemplate.setStatus(UserTemplateStatus.NORMAL.getValue());
+        userTemplate.setStatus(UserTemplateStatus.CLOSE.getValue());
         userTemplate.setAppId(UserContext.currentUserAppId());
         userTemplate.setNumber(UUID.randomUUID().toString());
         userTemplate.setViewCount(0);
@@ -106,11 +106,56 @@ public class UserTemplateServiceWeb {
         condition.put("number",number);
         List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
         if(userTemplateList.size()>0){
-            MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
-            DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
-            return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+            if(userTemplateList.get(0).get("status").equals(UserTemplateStatus.NORMAL)){
+                MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+                DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
+                return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+            }else {
+                return JsonResultUtils.getObjectResultByStringAsDefault("对不起，该卡片还未发布",JsonResultUtils.Code.ERROR);
+            }
+
         }
-        return JsonResultUtils.getObjectResultByStringAsDefault("操作错误",JsonResultUtils.Code.SUCCESS);
+        return JsonResultUtils.getObjectResultByStringAsDefault("卡片编号不存在！",JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/previewByNumber")
+    @POST
+    public String previewByNumber(@FormParam("number") String number){
+        if(number==null||number.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+        HashMap<String,Object> condition = new HashMap<String, Object>();
+        condition.put("number",number);
+        List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
+        if(userTemplateList.size()>0){
+            if (userTemplateList.get(0).get("userId").equals(UserContext.currentUserId())){
+                MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+                DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
+                return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+            }else {
+                return JsonResultUtils.getObjectResultByStringAsDefault("您不是卡片的所有者，不能预览模板！",JsonResultUtils.Code.SUCCESS);
+            }
+
+        }
+        return JsonResultUtils.getObjectResultByStringAsDefault("卡片编号不存在！",JsonResultUtils.Code.SUCCESS);
+    }
+
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    @Path("/publishByNumber")
+    @POST
+    public String publishByNumber(@FormParam("number") String number){
+        if(number==null||number.trim().equals("")){
+            return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
+        }
+
+        UserTemplate userTemplate = new UserTemplate();
+        userTemplate.setUserId(UserContext.currentUserId());
+        userTemplate.setNumber(number);
+        userTemplate.setStatus(UserTemplateStatus.NORMAL.getValue());
+        userTemplateService.updateByNumber(userTemplate);
+
+        return JsonResultUtils.getObjectResultByStringAsDefault("发布成功！",JsonResultUtils.Code.SUCCESS);
     }
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")

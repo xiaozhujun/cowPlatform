@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class UserTemplate {
     private Long id;
+    private String cname;
     private String number;
     private Long userId;
     private Long templateId;
@@ -27,6 +28,14 @@ public class UserTemplate {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCname() {
+        return cname;
+    }
+
+    public void setCname(String cname) {
+        this.cname = cname;
     }
 
     public String getNumber() {

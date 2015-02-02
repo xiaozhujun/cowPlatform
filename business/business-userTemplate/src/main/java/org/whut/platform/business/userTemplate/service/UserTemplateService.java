@@ -27,6 +27,10 @@ public class UserTemplateService {
         return mapper.update(userTemplate);
     }
 
+    public int updateByNumber(UserTemplate userTemplate){
+        return mapper.updateByNumber(userTemplate);
+    }
+
     public int delete(UserTemplate userTemplate){
         return mapper.delete(userTemplate);
     }

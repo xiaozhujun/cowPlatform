@@ -15,4 +15,5 @@ import java.util.Map;
  */
 public interface UserTemplateMapper extends AbstractMapper<UserTemplate> {
     public List<Map<String,Object>> findByCondition(Map<String,Object> map);
+    public int updateByNumber(UserTemplate userTemplate);
 }

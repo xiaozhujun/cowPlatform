@@ -4,11 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.whut.platform.business.userTemplate.mapper.UserTemplateMapper">
     <sql id="user_template_fields">
-		id,number,userId,templateId,mongoId,createTime,status,viewCount,appId
+		id,cname,number,userId,templateId,mongoId,createTime,status,viewCount,appId
 	</sql>
 
     <resultMap id="user_templateResultMap" type="UserTemplate">
         <id property="id" column="id" />
+        <result property="cname" column="cname"/>
         <result property="number" column="number"/>
         <result property="userId" column="userId" />
         <result property="templateId" column="templateId" />
@@ -25,7 +26,7 @@
         user_template(
         <include refid="user_template_fields" />
         )
-        VALUES (#{id},#{number},#{userId},#{templateId},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
+        VALUES (#{id},#{cname},#{number},#{userId},#{templateId},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
         <selectKey resultType="long" keyProperty="id">
             select
             LAST_INSERT_ID() as id
@@ -41,11 +42,23 @@
     <update id="update" parameterType="UserTemplate">
         UPDATE user_template
         <set>
+            <if test="cname != null">cname=#{cname},</if>
             <if test="mongoId != null">mongoId=#{mongoId},</if>
             <if test="viewCount != null">viewCount=#{viewCount},</if>
             <if test="status != null">status=#{status}</if>
         </set>
         WHERE ID = #{id};
+    </update>
+
+    <update id="updateByNumber" parameterType="UserTemplate">
+        UPDATE user_template
+        <set>
+            <if test="cname != null">cname=#{cname},</if>
+            <if test="mongoId != null">mongoId=#{mongoId},</if>
+            <if test="viewCount != null">viewCount=#{viewCount},</if>
+            <if test="status != null">status=#{status}</if>
+        </set>
+        WHERE userId=#{userId} and number=#{number};
     </update>
 
     <delete id="delete" parameterType="UserTemplate">
@@ -71,6 +84,7 @@
             <if test="userId!=null"> user_template.userId=#{userId}</if>
             <if test="number!=null">AND user_template.number=#{number}</if>
             <if test="categoryId!=null">AND category.id=#{categoryId}</if>
+            <if test="cname!=null">AND user_template.cname like CONCAT('%','${cname}','%' ) </if>
             <if test="categoryName!=null">AND template.name like CONCAT('%','${categoryName}','%' ) </if>
             <if test="templateId!=null">AND user_template.templateId=#{templateId}</if>
             <if test="status!=null">AND user_template.status=#{status} </if>
