@@ -75,7 +75,7 @@
     </select>
 
     <select id="findByCondition" parameterType="map" resultType="map">
-        select user_template.*,`user`.`name` userName,template.`name` templateName,category.name categoryName
+        select user_template.*,`user`.`name` userName,template.`name` templateName,template.`url` templateUrl,category.name categoryName
         from user_template
         LEFT JOIN user ON user_template.userId=`user`.id
         LEFT JOIN template ON user_template.templateId=template.id

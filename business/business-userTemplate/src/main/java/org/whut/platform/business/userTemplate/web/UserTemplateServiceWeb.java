@@ -13,9 +13,17 @@ import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.mongo.connector.MongoConnector;
 import org.whut.platform.fundamental.util.json.JsonMapper;
 import org.whut.platform.fundamental.util.json.JsonResultUtils;
+import org.whut.platform.fundamental.util.qrcode.QRCode;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 /**
@@ -48,6 +56,10 @@ public class UserTemplateServiceWeb {
         }
         UserTemplate userTemplate = new UserTemplate();
         userTemplate.setTemplateNumber((String)params.get("templateNumber"));
+        Object cname = params.get("cname");
+        if(cname!=null){
+            userTemplate.setCname((String)cname);
+        }
         userTemplate.setUserId(UserContext.currentUserId());
         userTemplate.setCreateTime(new Date());
         userTemplate.setStatus(UserTemplateStatus.CLOSE.getValue());
@@ -184,4 +196,33 @@ public class UserTemplateServiceWeb {
         return JsonResultUtils.getObjectResultByStringAsDefault(userTemplateList,JsonResultUtils.Code.SUCCESS);
     }
 
+    @GET
+    @Path("/getQRCode/{number}")
+    @Produces("image/png")
+    public Response getQRCode(@PathParam("number") String number){
+        try {
+            if(number==null||number.trim().equals("")){
+                return null;
+            }
+            HashMap<String,Object> condition = new HashMap<String, Object>();
+            condition.put("number", number);
+            List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
+            if(userTemplateList.size()>0){
+                if(userTemplateList.get(0).get("status").equals(UserTemplateStatus.NORMAL.getValue())){
+                    Map<String,Object> card = userTemplateList.get(0);
+                    String qrCode ="http://www.cseicms.com"+card.get("templateUrl")+"?cardNumber="+card.get("number");
+                    BufferedImage image = QRCode.createQRCode(qrCode, 200, 200);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(image, "png", baos);
+                    byte[] imageData = baos.toByteArray();
+
+                    return Response.ok(imageData).build();
+                }
+            }
+        }catch (Exception e){
+           logger.error(e.getMessage());
+        }
+        return null;
+    }
 }
