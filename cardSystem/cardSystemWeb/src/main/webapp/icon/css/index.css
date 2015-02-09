@@ -1,0 +1,68 @@
+@import "project-common.css";
+table.list {
+    background: none repeat scroll 0 0 #ccc;
+    border: 1px solid #bbb;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+table.list td {
+    background: none repeat scroll 0 0 #eee;
+    border-bottom: 1px solid #999;
+    border-right: 1px solid #999;
+    border-width: 0 1px 1px 0;
+    padding: 0.4em 1em;
+}
+table.list th {
+    background: none repeat scroll 0 0 #bbb;
+    border-bottom: 1px solid #555;
+    border-right: 1px solid #555;
+    border-width: 0 1px 1px 0;
+    padding: 0.4em 1em;
+}
+.demo {
+    background: none repeat scroll 0 0 #eee;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    padding: 0.6em;
+}
+.demo p {
+    margin: 0.3em auto;
+    padding: 0.3em 0.6em;
+}
+.demo p.instructions {
+    color: #666;
+    font-family: serif;
+    font-style: italic;
+    line-height: 130%;
+}
+ul.features {
+    color: #333;
+    line-height: 135%;
+}
+.demo table td {
+}
+.demo table td {
+    padding-left: 1em;
+}
+.demo table td input {
+    text-align: right;
+    width: 4em;
+}
+p.major {
+    color: #777;
+    font-size: 125%;
+    font-weight: bold;
+}
+p.major a, p.major a:visited {
+    color: #2073d1;
+}
+div.frame {
+    background: none repeat scroll 0 0 #fff;
+    border: 2px solid #ddd;
+    padding: 0.8em;
+}
+
+body {
+    font-family: Arial,sans-serif;
+    font-size: 0.92em;
+}

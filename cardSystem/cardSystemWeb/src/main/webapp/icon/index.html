@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>上传用户头像</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/imgareaselect-animated.css" />
+
+    <script src="scripts/jquery.min.js" type="text/javascript"></script>
+    <script src="scripts/jquery.imgareaselect.pack.js" type="text/javascript"></script>
+    <script src="scripts/jquery.form.js" type="text/javascript" ></script>
+    <script src="scripts/jquery.json-2.4.min.js" type="text/javascript" ></script>
+</head>
+<body>
+<script type="text/javascript">
+    var curSelection;
+    var originalImage;
+    var originalWidth;
+    var originalHeight;
+    var scale;
+    function preview(img, selection) {
+        if (!selection.width || !selection.height)
+            return;
+
+        var scaleX = 100 / selection.width;
+        var scaleY = 100 / selection.height;
+
+        $('#preview img').css({
+            width: Math.round(scaleX * 300),
+//            height: Math.round(scaleY * 300),
+            marginLeft: -Math.round(scaleX * selection.x1),
+            marginTop: -Math.round(scaleY * selection.y1)
+        });
+
+        curSelection = selection;
+
+        $('#x1').val(selection.x1);
+        $('#y1').val(selection.y1);
+        $('#x2').val(selection.x2);
+        $('#y2').val(selection.y2);
+        $('#w').val(selection.width);
+        $('#h').val(selection.height);
+    }
+
+
+
+    function iconUploadCallback(data){
+        alert(data.data);
+        $("#userIcon").attr("src","http://www.cseicms.com"+data.data);
+    }
+
+    function uploadImage(){
+        $("#imageUploadForm").ajaxSubmit({success:uploadImageCallback,dataType:'json',type:'post',url:'/card/rs/userIcon/uploadImage'});
+    }
+
+    function uploadImageCallback(data){
+        if(data.code==200){
+            $("#photo").attr("src","http://www.cseicms.com"+data.data);
+
+            document.getElementById("photo").onload=function()
+            {
+                var screenImage = $("#photo");
+                var theImage = new Image();
+                theImage.src = screenImage.attr("src");
+                originalWidth = theImage.width;
+                originalHeight = theImage.height;
+                scale=Math.round(originalWidth/300);
+            }
+
+
+            $("#icon").attr("src","http://www.cseicms.com"+data.data);
+            originalImage = data.data;
+        }
+        else if(data.code==500)
+        {
+            alert(data.message);
+        }
+    }
+
+    $(function () {
+        $('#photo').imgAreaSelect({ aspectRatio: '1:1', handles: true,
+            fadeSpeed: 200, onSelectChange: preview });
+        $("#uploadBtn").click(function(){
+            uploadImage();
+        });
+
+        $("#iconUploadBtn").click(function(){
+            var data={};
+            data.x = Math.round(curSelection.x1*scale);
+            data.y = Math.round(curSelection.y1*scale);;
+            data.w = Math.round(curSelection.width*scale);
+            data.h = Math.round(curSelection.height*scale);
+            data.originalImage=originalImage;
+            $.post("/card/rs/userIcon/cutImage",{"jsonString": $.toJSON(data)},iconUploadCallback,"json");
+        });
+    });
+</script>
+<div class="container demo">
+    <form name="imageUploadForm" method="post" action="" id="imageUploadForm">
+        <table cellpadding="0" cellspacing="0" class="l-table-edit" width="80%">
+            <tr>
+                <td align="right" class="l-table-edit-td">上传头像:</td>
+                <td align="left" class="l-table-edit-td">
+                    <form id="stockInImageUploadForm" action="rs/userIcon/uploadImage" method="POST" enctype="multipart/form-data">
+                        <input name="filename" type="file" >
+                        <button id="uploadBtn" type="button" text="上传">上传</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div class="container demo">
+    <div style="float: left; width: 50%;">
+        <p class="instructions">
+            Click and drag on the image to select an area.
+        </p>
+
+        <div style="margin: 0 0.3em; width: 300px; height: 300px;" class="frame">
+            <img id="photo" src="http://odyniec.net/projects/imgareaselect/flower2.jpg" width="300px">
+        </div>
+    </div>
+
+    <div style="float: left; width: 50%;">
+        <p style="font-size: 110%; font-weight: bold; padding-left: 0.1em;">
+            Selection Preview
+        </p>
+
+        <div style="margin: 0 1em; width: 100px; height: 100px;" class="frame">
+            <div style="width: 100px; height: 100px; overflow: hidden;" id="preview">
+                <img id="icon" style="width: 100px; " src="http://odyniec.net/projects/imgareaselect/flower2.jpg">
+            </div>
+        </div>
+
+        <table style="margin-top: 1em;">
+            <thead>
+            <tr>
+                <th style="font-size: 110%; font-weight: bold; text-align: left; padding-left: 0.1em;" colspan="2">
+                    Coordinates
+                </th>
+                <th style="font-size: 110%; font-weight: bold; text-align: left; padding-left: 0.1em;" colspan="2">
+                    Dimensions
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="width: 10%;"><b>X<sub>1</sub>:</b></td>
+                <td style="width: 30%;"><input type="text" value="-" id="x1"></td>
+                <td style="width: 20%;"><b>Width:</b></td>
+                <td><input type="text" id="w" value="-"></td>
+            </tr>
+            <tr>
+                <td><b>Y<sub>1</sub>:</b></td>
+                <td><input type="text" value="-" id="y1"></td>
+                <td><b>Height:</b></td>
+                <td><input type="text" value="-" id="h"></td>
+            </tr>
+            <tr>
+                <td><b>X<sub>2</sub>:</b></td>
+                <td><input type="text" value="-" id="x2"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>Y<sub>2</sub>:</b></td>
+                <td><input type="text" value="-" id="y2"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button id="iconUploadBtn" type="button" >提交</button> </td>
+                <td colspan="2"><img id="userIcon" src="" alt="" width="100px"> </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

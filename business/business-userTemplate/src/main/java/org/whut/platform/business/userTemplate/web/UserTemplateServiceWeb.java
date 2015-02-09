@@ -212,11 +212,9 @@ public class UserTemplateServiceWeb {
                     Map<String,Object> card = userTemplateList.get(0);
                     String qrCode ="http://www.cseicms.com"+card.get("templateUrl")+"?cardNumber="+card.get("number");
                     BufferedImage image = QRCode.createQRCode(qrCode, 200, 200);
-
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(image, "png", baos);
                     byte[] imageData = baos.toByteArray();
-
                     return Response.ok(imageData).build();
                 }
             }
