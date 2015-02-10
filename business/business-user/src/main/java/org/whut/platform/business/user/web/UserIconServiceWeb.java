@@ -160,6 +160,12 @@ public class UserIconServiceWeb {
         user.setImage(userIconWebPath);
         userService.updateUserImage(user);
 
+        //如果文件存在则删除
+        File originalImageFile = new File(webAppPath);
+        if(originalImageFile.exists()){
+            userIconFile.delete();
+        }
+
         // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
         return JsonResultUtils.getObjectResultByStringAsDefault(userIconWebPath,JsonResultUtils.Code.SUCCESS);
     }
