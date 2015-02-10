@@ -30,7 +30,7 @@ public class ImageCut {
             int srcHeight = bi.getHeight(); // 源图高度
             if (srcWidth >= destWidth && srcHeight >= destHeight) {
                 Image image = bi.getScaledInstance(srcWidth, srcHeight,
-                        Image.SCALE_DEFAULT);
+                        Image.SCALE_SMOOTH);
                 // 改进的想法:是否可用多线程加快切割速度
                 // 四个参数分别为图像起点坐标和宽高
                 // 即: CropImageFilter(int x,int y,int width,int height)

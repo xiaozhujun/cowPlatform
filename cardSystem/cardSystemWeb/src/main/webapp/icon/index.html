@@ -19,7 +19,8 @@
     var originalImage;
     var originalWidth;
     var originalHeight;
-    var scale;
+
+    var originalScaleX,originalScaleY,scale;
     function preview(img, selection) {
         if (!selection.width || !selection.height)
             return;
@@ -42,17 +43,6 @@
         $('#y2').val(selection.y2);
         $('#w').val(selection.width);
         $('#h').val(selection.height);
-    }
-
-
-
-    function iconUploadCallback(data){
-        alert(data.data);
-        $("#userIcon").attr("src","http://www.cseicms.com"+data.data);
-    }
-
-    function uploadImage(){
-        $("#imageUploadForm").ajaxSubmit({success:uploadImageCallback,dataType:'json',type:'post',url:'/card/rs/userIcon/uploadImage'});
     }
 
     function uploadImageCallback(data){
@@ -79,6 +69,15 @@
         }
     }
 
+    function iconUploadCallback(data){
+        alert(data.data);
+        $("#userIcon").attr("src","http://www.cseicms.com"+data.data);
+    }
+
+    function uploadImage(){
+        $("#imageUploadForm").ajaxSubmit({success:uploadImageCallback,dataType:'json',type:'post',url:'/card/rs/userIcon/uploadImage'});
+    }
+
     $(function () {
         $('#photo').imgAreaSelect({ aspectRatio: '1:1', handles: true,
             fadeSpeed: 200, onSelectChange: preview });
@@ -88,10 +87,10 @@
 
         $("#iconUploadBtn").click(function(){
             var data={};
-            data.x = Math.round(curSelection.x1*scale);
-            data.y = Math.round(curSelection.y1*scale);;
-            data.w = Math.round(curSelection.width*scale);
-            data.h = Math.round(curSelection.height*scale);
+            data.x = Math.round(curSelection.x1*originalWidth/300);
+            data.y = Math.round(curSelection.y1*originalWidth/300);;
+            data.w = Math.round(curSelection.width*originalWidth/300);
+            data.h = Math.round(curSelection.height*originalWidth/300);
             data.originalImage=originalImage;
             $.post("/card/rs/userIcon/cutImage",{"jsonString": $.toJSON(data)},iconUploadCallback,"json");
         });
