@@ -23,7 +23,9 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        response.setHeader("Content-type","application/json;charset=UTF-8");
+        response.setContentType("text/html; charset=utf-8");
+        response.setHeader("pragma", "no-cache");
+        response.setHeader("cache-control", "no-cache");
         response.getWriter().write("{\"code\":500,\"msg\":\"账号或者密码不正确！\"}");
         logger.info("{\"code\":500,\"msg\":\"账号或者密码不正确！\"}");
         response.getWriter().flush();

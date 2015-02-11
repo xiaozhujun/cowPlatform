@@ -16,6 +16,7 @@ import org.whut.platform.fundamental.util.json.JsonMapper;
 import org.whut.platform.fundamental.util.json.JsonResultUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -46,10 +47,14 @@ public class UserIconServiceWeb {
     private UserService userService;
 
     //上传原始图片
-    @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Produces( MediaType.TEXT_HTML + ";charset=UTF-8")
     @Path("/uploadImage")
     @POST
-    public String uploadImage(@Context HttpServletRequest request){
+    public String uploadImage(@Context HttpServletRequest request,@Context HttpServletResponse response){
+//        response.setContentType("text/html");
+        response.setHeader("pragma", "no-cache");
+        response.setHeader("cache-control", "no-cache");
+
         if(request==null){
             return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.ERROR);
         }
@@ -97,11 +102,15 @@ public class UserIconServiceWeb {
     }
 
     //上传原始图片
-    @Produces( MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    @Produces( MediaType.TEXT_HTML + ";charset=UTF-8")
     @Path("/cutImage")
     @POST
-    public String cutImage(@FormParam("jsonString") String jsonString,@Context HttpServletRequest request){
-         String userIconImagePath = "";
+    public String cutImage(@FormParam("jsonString") String jsonString,@Context HttpServletRequest request,@Context HttpServletResponse response){
+//        response.setContentType("text/html");
+        response.setHeader("pragma", "no-cache");
+        response.setHeader("cache-control", "no-cache");
+
+        String userIconImagePath = "";
         if(jsonString==null||jsonString.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！",JsonResultUtils.Code.ERROR);
         }
@@ -150,24 +159,29 @@ public class UserIconServiceWeb {
         //进行剪切图片操作
         ImageCut.abscut(webAppPath, createImgPath, x, y, w, h);
 
+        User oldUser = userService.getById(UserContext.currentUserId());
+        String userOldIcon = oldUser.getImage();
+        if(userOldIcon!=null&&!userOldIcon.trim().equals("")){
+            File oldIconFile = new File(userImgRootPath+userOldIcon);
+            if(oldIconFile.exists()){
+                oldIconFile.delete();
+            }
+        }
+
         File f = new File(createImgPath);
         if(f.exists()){
             logger.info("剪切图片大小: "+w+"*"+h+"图片成功!");
+            User user = new User();
+            user.setId(UserContext.currentUserId());
+            user.setImage(userIconWebPath);
+            userService.updateUserImage(user);
+
+            // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
+            return JsonResultUtils.getObjectResultByStringAsDefault(userIconWebPath,JsonResultUtils.Code.SUCCESS);
         }
 
-        User user = new User();
-        user.setId(UserContext.currentUserId());
-        user.setImage(userIconWebPath);
-        userService.updateUserImage(user);
+        return JsonResultUtils.getObjectResultByStringAsDefault("头像上传失败！",JsonResultUtils.Code.ERROR);
 
-        //如果文件存在则删除
-        File originalImageFile = new File(webAppPath);
-        if(originalImageFile.exists()){
-            originalImageFile.delete();
-        }
-
-        // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
-        return JsonResultUtils.getObjectResultByStringAsDefault(userIconWebPath,JsonResultUtils.Code.SUCCESS);
     }
 
 

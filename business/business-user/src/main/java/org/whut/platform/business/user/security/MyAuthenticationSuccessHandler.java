@@ -23,7 +23,9 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        response.setHeader("Content-type","application/json;charset=UTF-8");
+        response.setContentType("text/html; charset=utf-8");
+        response.setHeader("pragma", "no-cache");
+        response.setHeader("cache-control", "no-cache");
         MyUserDetail userDetail = null;
         try{
             userDetail = UserContext.currentUser();

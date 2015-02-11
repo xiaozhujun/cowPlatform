@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.whut.platform.business.userTemplate.mapper.UserTemplateMapper">
     <sql id="user_template_fields">
-		id,cname,number,userId,templateId,mongoId,createTime,status,viewCount,appId
+		id,cname,number,userId,templateNumber,mongoId,createTime,status,viewCount,appId
 	</sql>
 
     <resultMap id="user_templateResultMap" type="UserTemplate">
@@ -12,7 +12,7 @@
         <result property="cname" column="cname"/>
         <result property="number" column="number"/>
         <result property="userId" column="userId" />
-        <result property="templateId" column="templateId" />
+        <result property="templateNumber" column="templateNumber" />
         <result property="mongoId" column="mongoId"/>
         <result property="createTime" column="createTime"/>
         <result property="status" column="status"/>
@@ -26,7 +26,7 @@
         user_template(
         <include refid="user_template_fields" />
         )
-        VALUES (#{id},#{cname},#{number},#{userId},#{templateId},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
+        VALUES (#{id},#{cname},#{number},#{userId},#{templateNumber},#{mongoId},#{createTime},#{status},#{viewCount},#{appId});
         <selectKey resultType="long" keyProperty="id">
             select
             LAST_INSERT_ID() as id
@@ -78,7 +78,7 @@
         select user_template.*,`user`.`name` userName,template.`name` templateName,template.`number` templateNumber,template.`url` templateUrl,category.name categoryName
         from user_template
         LEFT JOIN user ON user_template.userId=`user`.id
-        LEFT JOIN template ON user_template.templateId=template.id
+        LEFT JOIN template ON user_template.templateNumber=template.number
         LEFT JOIN category ON template.categoryId=category.id
         <where>
             <if test="userId!=null"> user_template.userId=#{userId}</if>
@@ -86,7 +86,7 @@
             <if test="categoryId!=null">AND category.id=#{categoryId}</if>
             <if test="cname!=null">AND user_template.cname like CONCAT('%','${cname}','%' ) </if>
             <if test="categoryName!=null">AND template.name like CONCAT('%','${categoryName}','%' ) </if>
-            <if test="templateId!=null">AND user_template.templateId=#{templateId}</if>
+            <if test="templateNumber!=null">AND user_template.templateNumber=#{templateNumber}</if>
             <if test="status!=null">AND user_template.status=#{status} </if>
             <if test="startTime!=null"><![CDATA[ AND user_template.createTime>=#{startTime}]]></if>
             <if test="endTime!=null"><![CDATA[ AND user_template.createTime<=#{endTime} ]]> </if>

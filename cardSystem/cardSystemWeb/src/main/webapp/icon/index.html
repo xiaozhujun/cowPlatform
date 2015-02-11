@@ -20,6 +20,10 @@
     var originalWidth;
     var originalHeight;
 
+    var imageWidth;
+    var imageHeight;
+    var status = 1;
+
     var originalScaleX,originalScaleY,scale;
     function preview(img, selection) {
         if (!selection.width || !selection.height)
@@ -29,8 +33,8 @@
         var scaleY = 100 / selection.height;
 
         $('#preview img').css({
-            width: Math.round(scaleX * 300),
-//            height: Math.round(scaleY * 300),
+            width: Math.round(scaleX * imageWidth),
+            height: Math.round(scaleY * imageHeight),
             marginLeft: -Math.round(scaleX * selection.x1),
             marginTop: -Math.round(scaleY * selection.y1)
         });
@@ -45,23 +49,48 @@
         $('#h').val(selection.height);
     }
 
+    function setImage(image){
+        $("#photo").attr("src",image);
+
+        document.getElementById("photo").onload=function()
+        {
+            var screenImage = $("#photo");
+            var theImage = new Image();
+            theImage.src = screenImage.attr("src");
+            originalWidth = theImage.width;
+            originalHeight = theImage.height;
+            if(originalWidth>originalHeight){
+                imageWidth = 300;
+                imageHeight =originalHeight*300/originalWidth;
+                screenImage.attr("width",imageWidth);
+                screenImage.attr("height",imageHeight);
+            }else{
+                imageWidth =originalWidth*300/originalHeight;
+                imageHeight = 300;
+                screenImage.attr("width",imageWidth);
+                screenImage.attr("height",imageHeight);
+            }
+            scale=Math.round(originalWidth/300);
+
+            imageAreaSelect = $('#photo').imgAreaSelect({ aspectRatio: '1:1', handles: true,
+                fadeSpeed: 200, onSelectChange: preview,instance:true });
+
+            imageAreaSelect.setSelection((imageWidth-150)/2,(imageHeight-150)/2,(imageWidth-150)/2+150,(imageHeight-150)/2+150);
+            imageAreaSelect.setOptions({ show: true });
+            imageAreaSelect.update(true);
+
+            preview($('#photo'),{x1:(imageWidth-150)/2,y1:(imageHeight-150)/2,x2:(imageWidth-150)/2+150,y2:(imageHeight-150)/2+150,width:150,height:150})
+        }
+
+
+        $("#icon").attr("src",image);
+    }
+
     function uploadImageCallback(data){
         if(data.code==200){
-            $("#photo").attr("src","http://www.cseicms.com"+data.data);
-
-            document.getElementById("photo").onload=function()
-            {
-                var screenImage = $("#photo");
-                var theImage = new Image();
-                theImage.src = screenImage.attr("src");
-                originalWidth = theImage.width;
-                originalHeight = theImage.height;
-                scale=Math.round(originalWidth/300);
-            }
-
-
-            $("#icon").attr("src","http://www.cseicms.com"+data.data);
-            originalImage = data.data;
+           setImage("http://www.cseicms.com"+data.data)
+           originalImage = data.data;
+           status = 0;
         }
         else if(data.code==500)
         {
@@ -70,30 +99,38 @@
     }
 
     function iconUploadCallback(data){
-        alert(data.data);
         $("#userIcon").attr("src","http://www.cseicms.com"+data.data);
     }
 
     function uploadImage(){
+        var file = $("#uploadFile").val();
+        if(file==""||file==undefined){
+            alert("请您选择您要上传的头像！");
+            return;
+        }
         $("#imageUploadForm").ajaxSubmit({success:uploadImageCallback,dataType:'json',type:'post',url:'/card/rs/userIcon/uploadImage'});
     }
 
     $(function () {
-        $('#photo').imgAreaSelect({ aspectRatio: '1:1', handles: true,
-            fadeSpeed: 200, onSelectChange: preview });
         $("#uploadBtn").click(function(){
             uploadImage();
         });
 
         $("#iconUploadBtn").click(function(){
+            if(status==1){
+                alert("请您先上传您的个人头像！");
+                return;
+            }
+
             var data={};
-            data.x = Math.round(curSelection.x1*originalWidth/300);
-            data.y = Math.round(curSelection.y1*originalWidth/300);;
-            data.w = Math.round(curSelection.width*originalWidth/300);
-            data.h = Math.round(curSelection.height*originalWidth/300);
+            data.x = Math.round(curSelection.x1*originalWidth/imageWidth);
+            data.y = Math.round(curSelection.y1*originalHeight/imageHeight);;
+            data.w = Math.round(curSelection.width*originalWidth/imageWidth);
+            data.h = Math.round(curSelection.height*originalHeight/imageHeight);
             data.originalImage=originalImage;
             $.post("/card/rs/userIcon/cutImage",{"jsonString": $.toJSON(data)},iconUploadCallback,"json");
         });
+        setImage("http://odyniec.net/projects/imgareaselect/flower2.jpg");
     });
 </script>
 <div class="container demo">
@@ -103,7 +140,7 @@
                 <td align="right" class="l-table-edit-td">上传头像:</td>
                 <td align="left" class="l-table-edit-td">
                     <form id="stockInImageUploadForm" action="rs/userIcon/uploadImage" method="POST" enctype="multipart/form-data">
-                        <input name="filename" type="file" >
+                        <input id="uploadFile" name="filename" type="file" >
                         <button id="uploadBtn" type="button" text="上传">上传</button>
                     </form>
                 </td>
@@ -117,8 +154,8 @@
             Click and drag on the image to select an area.
         </p>
 
-        <div style="margin: 0 0.3em; width: 300px; height: 300px;" class="frame">
-            <img id="photo" src="http://odyniec.net/projects/imgareaselect/flower2.jpg" width="300px">
+        <div style="margin: 0 0.3em; width: 300px; height: 300px;text-align: center" class="frame">
+            <img id="photo" src="" width="300px">
         </div>
     </div>
 
@@ -129,7 +166,7 @@
 
         <div style="margin: 0 1em; width: 100px; height: 100px;" class="frame">
             <div style="width: 100px; height: 100px; overflow: hidden;" id="preview">
-                <img id="icon" style="width: 100px; " src="http://odyniec.net/projects/imgareaselect/flower2.jpg">
+                <img id="icon" style="width: 100px; " src="">
             </div>
         </div>
 
