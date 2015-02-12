@@ -99,9 +99,11 @@ public class ResourceServiceWeb {
         }
         MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
         MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
-        String resourceId = multipartRequest.getParameter("resourceId");
-        if(resourceId==null||resourceId.equals("")){
-            return JsonResultUtils.getCodeAndMesByString(JsonResultUtils.Code.ERROR.getCode(),"模板编号不能为空！");
+        String resourceType = multipartRequest.getParameter("resourceType");
+        if(resourceType!=null&&!resourceType.trim().equals("")){
+            resourceType+="/";
+        }else{
+            resourceType="";
         }
 
         MultipartFile file = multipartRequest.getFile("filename");
@@ -111,22 +113,30 @@ public class ResourceServiceWeb {
 
         //获得模板路径
         String resourceRootPath =  FundamentalConfigProvider.get("user.template.resource.root.path") ;
-        String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path") ;
-        String resourceUploadPath = resourceRootPath+resourceRelativePath;
+        String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path")+"/"+resourceType ;
+        String resourceUploadPath = resourceRootPath + resourceRelativePath;
 
         String resourceName = UUID.randomUUID().toString();
-        String resourcePath =  resourceUploadPath+"/"+ resourceName+"."+suffix;
-        String resourceWebPath = resourceRelativePath+"/"+resourceName+"."+suffix;
+        String resourcePath =  resourceUploadPath + resourceName + "." + suffix;
+        String resourceWebPath = resourceRelativePath + resourceName +"." + suffix;
 
         //如果文件存在则删除
         File resourceFile = new File(resourcePath);
         if(resourceFile.exists()){
             resourceFile.delete();
         }else{
-            File resourceDir = new File(resourceUploadPath+"/");
+            File resourceDir = new File(resourceUploadPath);
             if(!resourceDir.exists()){
                 resourceDir.mkdirs();
             }
+        }
+
+        //写用户图片文件到指定路径
+        try {
+            file.transferTo(resourceFile);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return JsonResultUtils.getObjectResultByStringAsDefault("资源上传失败！",JsonResultUtils.Code.ERROR);
         }
 
         Resource resource = new Resource();
@@ -134,9 +144,15 @@ public class ResourceServiceWeb {
         resource.setAppId(UserContext.currentUserAppId());
         resource.setUserId(UserContext.currentUserId());
         resource.setStatus(ResourceStatus.NORMAL.getValue());
+        resource.setFile(resourcePath);
+        resource.setUrl(resourceWebPath);
         resource.setSuffix(suffix);
         resourceService.add(resource);
 
-        return JsonResultUtils.getObjectResultByStringAsDefault(resourceWebPath,JsonResultUtils.Code.SUCCESS);
+        HashMap<String,Object> map =new HashMap<String, Object>();
+        map.put("resourcePath",resourceWebPath);
+        map.put("resourceId",resource.getId());
+
+        return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
     }
 }

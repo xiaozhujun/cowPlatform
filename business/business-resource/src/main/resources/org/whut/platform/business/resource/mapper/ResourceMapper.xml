@@ -45,7 +45,10 @@
             <if test="url != null">content=#{content},</if>
             <if test="file != null">file=#{file},</if>
             <if test="status != null">status=#{status},</if>
-            <if test="suffix != null">suffix=#{suffix}</if>
+            <if test="suffix != null">suffix=#{suffix},</if>
+            <if test="userId != null">userId=#{userId},</if>
+            <if test="appId != null">appId=#{appId},</if>
+            <if test="userTemplateId != null">userTemplateId=#{userTemplateId}</if>
         </set>
         WHERE ID = #{id};
     </update>

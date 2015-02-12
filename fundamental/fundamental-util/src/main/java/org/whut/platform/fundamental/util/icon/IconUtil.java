@@ -1,15 +1,20 @@
-package org.whut.platform.business.user.icon;
+package org.whut.platform.fundamental.util.icon;
 
-
-import java.io.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.Graphics;
-import java.awt.color.ColorSpace;
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
 
-public class ImageCut {
-
+/**
+ * Created with IntelliJ IDEA.
+ * User: xiaozhujun
+ * Date: 15-2-12
+ * Time: 上午9:16
+ * To change this template use File | Settings | File Templates.
+ */
+public class IconUtil {
     /**
      * 图像切割（改）     *
      * @param srcImageFile            源图像地址

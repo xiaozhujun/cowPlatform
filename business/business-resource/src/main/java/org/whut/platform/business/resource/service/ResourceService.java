@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.whut.platform.business.resource.entity.Resource;
 import org.whut.platform.business.resource.mapper.ResourceMapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,6 +37,21 @@ public class ResourceService {
 
     public List<HashMap<String,Object>> findByCondition(HashMap<String,Object> condition){
         return resourceMapper.findByCondition(condition);
+    }
+
+    public void completeInfo(ArrayList<Long> resourceIdList,Long userId,Long appId,Long userTemplateId){
+        if(resourceIdList!=null){
+            Resource resource;
+            for(Long resourceId:resourceIdList){
+                resource = new Resource();
+                resource.setId(resourceId);
+                resource = this.getById(resource);
+                resource.setUserId(userId);
+                resource.setAppId(appId);
+                resource.setUserTemplateId(userTemplateId);
+                this.update(resource);
+            }
+        }
     }
 
 }

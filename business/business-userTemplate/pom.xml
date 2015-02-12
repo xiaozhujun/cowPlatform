@@ -117,5 +117,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>cowPlatform</groupId>
+            <artifactId>business-resource</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 </project>

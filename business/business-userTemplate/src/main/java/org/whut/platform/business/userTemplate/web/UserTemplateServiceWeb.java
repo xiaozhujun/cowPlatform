@@ -4,6 +4,7 @@ import com.mongodb.DBObject;
 import org.apache.tools.ant.taskdefs.Get;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.whut.platform.business.resource.service.ResourceService;
 import org.whut.platform.business.user.security.MyUserDetail;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.userTemplate.entity.UserTemplate;
@@ -41,6 +42,9 @@ public class UserTemplateServiceWeb {
     @Autowired
     private UserTemplateService userTemplateService;
 
+    @Autowired
+    private ResourceService resourceService;
+
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     @Path("/add")
@@ -60,6 +64,7 @@ public class UserTemplateServiceWeb {
         if(cname!=null){
             userTemplate.setCname((String)cname);
         }
+
         userTemplate.setUserId(UserContext.currentUserId());
         userTemplate.setCreateTime(new Date());
         userTemplate.setStatus(UserTemplateStatus.CLOSE.getValue());
@@ -72,6 +77,12 @@ public class UserTemplateServiceWeb {
         userTemplate.setMongoId(mongoId);
 
         userTemplateService.add(userTemplate);
+
+        if(params.get("resourceIdList")!=null){
+            ArrayList<Long> resourceIdList = (ArrayList<Long>)params.get("resourceIdList");
+            resourceService.completeInfo(resourceIdList,UserContext.currentUserId(),UserContext.currentUserAppId(),userTemplate.getId());
+        }
+
         return JsonResultUtils.getObjectResultByStringAsDefault(userTemplate.getId(), JsonResultUtils.Code.SUCCESS);
     }
 

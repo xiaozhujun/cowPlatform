@@ -1,4 +1,4 @@
-package org.whut.platform.business.user.web;
+package org.whut.platform.business.resource.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,23 +25,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
  * User: xiaozhujun
- * Date: 15-2-9
- * Time: 下午6:22
+ * Date: 15-2-12
+ * Time: 上午9:11
  * To change this template use File | Settings | File Templates.
  */
 @Component
-@Path("/userIcon")
-public class UserIconServiceWeb {
-
-    private static final PlatformLogger logger = PlatformLogger.getLogger(UserIconServiceWeb.class);
+@Path("/resourceIcon")
+public class ResourceIconServiceWeb {
+    private static final PlatformLogger logger = PlatformLogger.getLogger(ResourceIconServiceWeb.class);
 
     @Autowired
     private UserService userService;
@@ -61,29 +58,34 @@ public class UserIconServiceWeb {
         MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
         MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
         MultipartFile file = multipartRequest.getFile("filename");
+
+        String resourceType = multipartRequest.getParameter("resourceType");
+        if(resourceType!=null&&!resourceType.trim().equals("")){
+            resourceType+="/";
+        }else{
+            resourceType="";
+        }
+
         String filename = file.getOriginalFilename();
         String[] temp = filename.split("\\.");
         String suffix = temp[temp.length-1];
 
         //获得用户图片路径
-        String userImgRootPath =  FundamentalConfigProvider.get("user.img.root.path") ;
-        String userImgRelativePath =  FundamentalConfigProvider.get("user.img.relative.path") ;
-        String userId = UserContext.currentUserId().toString();
+        String resourceRootPath =  FundamentalConfigProvider.get("user.template.resource.root.path") ;
+        String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path") +"/temp/"+resourceType;
 
-
-        long appId = UserContext.currentUserAppId();
         String imageName = UUID.randomUUID().toString();
-        String userImagePath =  userImgRootPath + userImgRelativePath+"/temp/"+appId+"/"+imageName+"."+suffix;
-        String userImageWebPath = userImgRelativePath+"/temp/"+appId+"/"+imageName+"."+suffix;
+        String imageAbsolutePath =  resourceRootPath + resourceRelativePath+imageName+"."+suffix;
+        String imageResourceWebPath = resourceRelativePath+imageName+"."+suffix;
 
 
         //如果文件存在则删除
-        File userImageFile = new File(userImagePath);
+        File userImageFile = new File(imageAbsolutePath);
 
         if(userImageFile.exists()){
             userImageFile.delete();
         }else{
-            File imageDir = new File(userImgRootPath+"/"+userImgRelativePath+"/temp/"+appId);
+            File imageDir = new File(resourceRootPath+"/"+resourceRelativePath);
             if(!imageDir.exists()){
                 imageDir.mkdirs();
             }
@@ -98,7 +100,7 @@ public class UserIconServiceWeb {
         }
 
         // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
-        return JsonResultUtils.getObjectResultByStringAsDefault(userImageWebPath,JsonResultUtils.Code.SUCCESS);
+        return JsonResultUtils.getObjectResultByStringAsDefault(imageResourceWebPath,JsonResultUtils.Code.SUCCESS);
     }
 
     //上传原始图片
@@ -122,26 +124,32 @@ public class UserIconServiceWeb {
         Integer w = (Integer)param.get("w");
         Integer h = (Integer)param.get("h");
 
+        String resourceType = (String)param.get("resourceType");
+        if(resourceType!=null&&!resourceType.trim().equals("")){
+            resourceType+="/";
+        }else{
+            resourceType="";
+        }
+
         //获取原显示图片路径
         String originalImage = (String)param.get("originalImage");
 
-        //获得用户图片路径
-        String userImgRootPath =  FundamentalConfigProvider.get("user.img.root.path") ;
-        String userImgRelativePath =  FundamentalConfigProvider.get("user.img.relative.path") ;
+        String resourceRootPath =  FundamentalConfigProvider.get("user.template.resource.root.path") ;
+        String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path") +"/"+resourceType;
+
 
         String[] temp = originalImage.split("\\.");
         String suffix = temp[temp.length-1];
 
-        long appId = UserContext.currentUserAppId();
         String iconName = UUID.randomUUID().toString();
-        String userIconWebPath = userImgRelativePath+"/"+appId+"/"+iconName+"."+suffix;
+        String resourceIconWebPath = resourceRelativePath+iconName+"."+suffix;
 
 
         //组装图片真实名称
-        String createImgPath = userImgRootPath + userIconWebPath;
+        String createImgPath = resourceRootPath + resourceIconWebPath;
 
         //之前上传的图片路径
-        String webAppPath = userImgRootPath + originalImage;
+        String webAppPath = resourceRootPath + originalImage;
 
         logger.info("原图片路径: " + webAppPath + ",新图片路径: " + createImgPath);
 
@@ -150,7 +158,7 @@ public class UserIconServiceWeb {
         if(userIconFile.exists()){
             userIconFile.delete();
         }else{
-            File imageDir = new File(userImgRootPath+"/"+userImgRelativePath+"/"+appId);
+            File imageDir = new File(resourceRootPath+"/"+resourceRelativePath);
             if(!imageDir.exists()){
                 imageDir.mkdirs();
             }
@@ -162,7 +170,7 @@ public class UserIconServiceWeb {
         User oldUser = userService.getById(UserContext.currentUserId());
         String userOldIcon = oldUser.getImage();
         if(userOldIcon!=null&&!userOldIcon.trim().equals("")){
-            File oldIconFile = new File(userImgRootPath+userOldIcon);
+            File oldIconFile = new File(resourceRootPath+userOldIcon);
             if(oldIconFile.exists()){
                 oldIconFile.delete();
             }
@@ -171,18 +179,12 @@ public class UserIconServiceWeb {
         File f = new File(createImgPath);
         if(f.exists()){
             logger.info("剪切图片大小: "+w+"*"+h+"图片成功!");
-            User user = new User();
-            user.setId(UserContext.currentUserId());
-            user.setImage(userIconWebPath);
-            userService.updateUserImage(user);
-
             // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
-            return JsonResultUtils.getObjectResultByStringAsDefault(userIconWebPath,JsonResultUtils.Code.SUCCESS);
+            return JsonResultUtils.getObjectResultByStringAsDefault(resourceIconWebPath,JsonResultUtils.Code.SUCCESS);
         }
 
         return JsonResultUtils.getObjectResultByStringAsDefault("头像上传失败！",JsonResultUtils.Code.ERROR);
 
     }
-
 
 }
