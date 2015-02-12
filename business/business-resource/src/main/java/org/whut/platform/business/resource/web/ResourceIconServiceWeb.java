@@ -6,6 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.whut.platform.business.resource.entity.Resource;
+import org.whut.platform.business.resource.entity.ResourceStatus;
+import org.whut.platform.business.resource.service.ResourceService;
 import org.whut.platform.business.user.entity.User;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.user.service.UserService;
@@ -25,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -41,7 +45,7 @@ public class ResourceIconServiceWeb {
     private static final PlatformLogger logger = PlatformLogger.getLogger(ResourceIconServiceWeb.class);
 
     @Autowired
-    private UserService userService;
+    private ResourceService resourceService;
 
     //上传原始图片
     @Produces( MediaType.TEXT_HTML + ";charset=UTF-8")
@@ -167,19 +171,19 @@ public class ResourceIconServiceWeb {
         //进行剪切图片操作
         IconUtil.abscut(webAppPath, createImgPath, x, y, w, h);
 
-        User oldUser = userService.getById(UserContext.currentUserId());
-        String userOldIcon = oldUser.getImage();
-        if(userOldIcon!=null&&!userOldIcon.trim().equals("")){
-            File oldIconFile = new File(resourceRootPath+userOldIcon);
-            if(oldIconFile.exists()){
-                oldIconFile.delete();
-            }
-        }
-
         File f = new File(createImgPath);
         if(f.exists()){
             logger.info("剪切图片大小: "+w+"*"+h+"图片成功!");
-            // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
+
+
+            Resource resource = new Resource();
+            resource.setCreateTime(new Date());
+            resource.setStatus(ResourceStatus.NORMAL.getValue());
+            resource.setFile(createImgPath);
+            resource.setUrl(resourceIconWebPath);
+            resource.setSuffix(suffix);
+            resourceService.add(resource);
+
             return JsonResultUtils.getObjectResultByStringAsDefault(resourceIconWebPath,JsonResultUtils.Code.SUCCESS);
         }
 

@@ -134,25 +134,24 @@ public class ResourceServiceWeb {
         //写用户图片文件到指定路径
         try {
             file.transferTo(resourceFile);
+
+            Resource resource = new Resource();
+            resource.setCreateTime(new Date());
+            resource.setStatus(ResourceStatus.NORMAL.getValue());
+            resource.setFile(resourcePath);
+            resource.setUrl(resourceWebPath);
+            resource.setSuffix(suffix);
+            resourceService.add(resource);
+
+            HashMap<String,Object> map =new HashMap<String, Object>();
+            map.put("resourcePath",resourceWebPath);
+            map.put("resourceId",resource.getId());
+            return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return JsonResultUtils.getObjectResultByStringAsDefault("资源上传失败！",JsonResultUtils.Code.ERROR);
         }
+        return JsonResultUtils.getObjectResultByStringAsDefault("资源上传失败！",JsonResultUtils.Code.ERROR);
 
-        Resource resource = new Resource();
-        resource.setCreateTime(new Date());
-        resource.setAppId(UserContext.currentUserAppId());
-        resource.setUserId(UserContext.currentUserId());
-        resource.setStatus(ResourceStatus.NORMAL.getValue());
-        resource.setFile(resourcePath);
-        resource.setUrl(resourceWebPath);
-        resource.setSuffix(suffix);
-        resourceService.add(resource);
 
-        HashMap<String,Object> map =new HashMap<String, Object>();
-        map.put("resourcePath",resourceWebPath);
-        map.put("resourceId",resource.getId());
-
-        return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
     }
 }
