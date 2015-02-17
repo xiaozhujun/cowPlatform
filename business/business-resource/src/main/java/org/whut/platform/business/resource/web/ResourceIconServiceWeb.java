@@ -12,6 +12,7 @@ import org.whut.platform.business.resource.service.ResourceService;
 import org.whut.platform.business.user.entity.User;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.user.service.UserService;
+import org.whut.platform.fundamental.bcs.BcsProxy;
 import org.whut.platform.fundamental.config.FundamentalConfigProvider;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.util.icon.IconUtil;
@@ -95,16 +96,25 @@ public class ResourceIconServiceWeb {
             }
         }
 
+        String resourceImageLocalPath = imageResourceWebPath;
         //写用户图片文件到指定路径
         try {
             file.transferTo(userImageFile);
+
+            if(FundamentalConfigProvider.isBae()){
+                imageResourceWebPath = BcsProxy.uploadFile(userImageFile,imageResourceWebPath);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
+        HashMap map = new HashMap();
+        map.put("imageLocalPath",resourceImageLocalPath);
+        map.put("imageWebPath",imageResourceWebPath);
+
         // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
-        return JsonResultUtils.getObjectResultByStringAsDefault(imageResourceWebPath,JsonResultUtils.Code.SUCCESS);
+        return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
     }
 
     //上传原始图片
@@ -175,6 +185,10 @@ public class ResourceIconServiceWeb {
         if(f.exists()){
             logger.info("剪切图片大小: "+w+"*"+h+"图片成功!");
 
+            if(FundamentalConfigProvider.isBae()){
+               resourceIconWebPath = BcsProxy.uploadFile(f,resourceIconWebPath);
+               f.delete();
+            }
 
             Resource resource = new Resource();
             resource.setCreateTime(new Date());
@@ -184,7 +198,10 @@ public class ResourceIconServiceWeb {
             resource.setSuffix(suffix);
             resourceService.add(resource);
 
-            return JsonResultUtils.getObjectResultByStringAsDefault(resourceIconWebPath,JsonResultUtils.Code.SUCCESS);
+            HashMap<String,Object> map =new HashMap<String, Object>();
+            map.put("resourcePath",resourceIconWebPath);
+            map.put("resourceId",resource.getId());
+            return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
         }
 
         return JsonResultUtils.getObjectResultByStringAsDefault("头像上传失败！",JsonResultUtils.Code.ERROR);

@@ -178,4 +178,13 @@ public class FundamentalConfigProvider {
        }
     }
 
+    //判断是否为百度云
+    public static boolean isBae(){
+        if(get("server.env.isBae").equals("true")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 }

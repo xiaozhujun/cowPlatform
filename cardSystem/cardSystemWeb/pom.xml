@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cardSystemWeb</artifactId>
     <packaging>war</packaging>
-    <name>cardSystemWe</name>
+    <name>cardSystemWeb</name>
     <url>http://maven.apache.org</url>
 
     <build>

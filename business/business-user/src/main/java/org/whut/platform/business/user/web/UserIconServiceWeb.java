@@ -9,6 +9,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.whut.platform.business.user.entity.User;
 import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.user.service.UserService;
+import org.whut.platform.fundamental.bcs.BcsProxy;
 import org.whut.platform.fundamental.config.FundamentalConfigProvider;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.util.icon.IconUtil;
@@ -89,16 +90,24 @@ public class UserIconServiceWeb {
             }
         }
 
+        String userImageLocalPath = userImageWebPath;
         //写用户图片文件到指定路径
         try {
             file.transferTo(userImageFile);
+            if(FundamentalConfigProvider.isBae()){
+                userImageWebPath = BcsProxy.uploadFile(userImageFile,userImageWebPath);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
+        HashMap map = new HashMap();
+        map.put("imageLocalPath",userImageLocalPath);
+        map.put("imageWebPath",userImageWebPath);
+
         // 新增操作时，返回操作状态和状态码给客户端，数据区是为空的
-        return JsonResultUtils.getObjectResultByStringAsDefault(userImageWebPath,JsonResultUtils.Code.SUCCESS);
+        return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
     }
 
     //上传原始图片
@@ -171,6 +180,12 @@ public class UserIconServiceWeb {
         File f = new File(createImgPath);
         if(f.exists()){
             logger.info("剪切图片大小: "+w+"*"+h+"图片成功!");
+
+            if(FundamentalConfigProvider.isBae()){
+                userIconWebPath = BcsProxy.uploadFile(f,userIconWebPath);
+                f.delete();
+            }
+
             User user = new User();
             user.setId(UserContext.currentUserId());
             user.setImage(userIconWebPath);

@@ -10,6 +10,7 @@ import org.whut.platform.business.user.security.UserContext;
 import org.whut.platform.business.userTemplate.entity.UserTemplate;
 import org.whut.platform.business.userTemplate.entity.UserTemplateStatus;
 import org.whut.platform.business.userTemplate.service.UserTemplateService;
+import org.whut.platform.fundamental.config.FundamentalConfigProvider;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.mongo.connector.MongoConnector;
 import org.whut.platform.fundamental.util.json.JsonMapper;
@@ -72,9 +73,16 @@ public class UserTemplateServiceWeb {
         userTemplate.setNumber(UUID.randomUUID().toString());
         userTemplate.setViewCount(0);
 
-        MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
-        String mongoId = mongoConnector.insertDocument(jsonString);
-        userTemplate.setMongoId(mongoId);
+        //如果是bae，则将json串存储入mysql；若是本地环境则存入mongo
+        if(FundamentalConfigProvider.isBae()){
+            userTemplate.setDocument(jsonString);
+        }else{
+            MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+            String mongoId = mongoConnector.insertDocument(jsonString);
+            userTemplate.setMongoId(mongoId);
+        }
+
+
 
         userTemplateService.add(userTemplate);
 
@@ -119,9 +127,9 @@ public class UserTemplateServiceWeb {
     }
 
     @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-    @Path("/getByNumber")
-    @POST
-    public String getByNumber(@FormParam("number") String number){
+    @Path("/getByNumber/{number}")
+    @GET
+    public String getByNumber(@PathParam("number") String number){
         if(number==null||number.trim().equals("")){
             return JsonResultUtils.getObjectResultByStringAsDefault("参数不能为空！", JsonResultUtils.Code.ERROR);
         }
@@ -129,10 +137,16 @@ public class UserTemplateServiceWeb {
         condition.put("number",number);
         List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
         if(userTemplateList.size()>0){
-            if(userTemplateList.get(0).get("status").equals(UserTemplateStatus.NORMAL)){
-                MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
-                DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
-                return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+            if(userTemplateList.get(0).get("status").equals(UserTemplateStatus.NORMAL.getValue())){
+                if(FundamentalConfigProvider.isBae()){
+                    String document = (String)userTemplateList.get(0).get("document");
+                    HashMap map =JsonMapper.buildNormalMapper().fromJson(document,HashMap.class);
+                    return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
+                }else{
+                    MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+                    DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
+                    return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+                }
             }else {
                 return JsonResultUtils.getObjectResultByStringAsDefault("对不起，该卡片还未发布",JsonResultUtils.Code.ERROR);
             }
@@ -153,9 +167,16 @@ public class UserTemplateServiceWeb {
         List<Map<String,Object>> userTemplateList = userTemplateService.findByCondition(condition);
         if(userTemplateList.size()>0){
             if (userTemplateList.get(0).get("userId").equals(UserContext.currentUserId())){
-                MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
-                DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
-                return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+                if(FundamentalConfigProvider.isBae()){
+                    String document = (String)userTemplateList.get(0).get("document");
+                    HashMap map =JsonMapper.buildNormalMapper().fromJson(document,HashMap.class);
+                    return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
+                }else{
+                    MongoConnector mongoConnector=new MongoConnector("userCardDB","userCardCollection");
+                    DBObject document = mongoConnector.getDocument(userTemplateList.get(0).get("mongoId").toString());
+                    return JsonResultUtils.getObjectResultByStringAsDefault(document,JsonResultUtils.Code.SUCCESS);
+                }
+
             }else {
                 return JsonResultUtils.getObjectResultByStringAsDefault("您不是卡片的所有者，不能预览模板！",JsonResultUtils.Code.SUCCESS);
             }
@@ -221,7 +242,7 @@ public class UserTemplateServiceWeb {
             if(userTemplateList.size()>0){
                 if(userTemplateList.get(0).get("status").equals(UserTemplateStatus.NORMAL.getValue())){
                     Map<String,Object> card = userTemplateList.get(0);
-                    String qrCode ="http://www.cseicms.com"+card.get("templateUrl")+"?cardNumber="+card.get("number");
+                    String qrCode =FundamentalConfigProvider.get("server.domain")+card.get("templateUrl")+"?cardNumber="+card.get("number");
                     BufferedImage image = QRCode.createQRCode(qrCode, 200, 200);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(image, "png", baos);

@@ -21,6 +21,7 @@ public class UserTemplate {
     private Integer status;
     private Integer viewCount;
     private Long appId;
+    private String document;
 
     public Long getId() {
         return id;
@@ -108,6 +109,14 @@ public class UserTemplate {
 
     public void setAppId(Long appId) {
         this.appId = appId;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
     }
 }
 

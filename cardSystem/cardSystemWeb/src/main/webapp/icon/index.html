@@ -88,7 +88,7 @@
 
     function uploadImageCallback(data){
         if(data.code==200){
-           setImage("http://www.cseicms.com"+data.data)
+           setImage("localhost"+data.data)
            originalImage = data.data;
            status = 0;
         }
@@ -99,7 +99,7 @@
     }
 
     function iconUploadCallback(data){
-        $("#userIcon").attr("src","http://www.cseicms.com"+data.data);
+        $("#userIcon").attr("src","localhost"+data.data);
     }
 
     function uploadImage(){

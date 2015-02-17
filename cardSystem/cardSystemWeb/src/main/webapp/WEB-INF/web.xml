@@ -30,17 +30,20 @@
         <param-value>/WEB-INF/applicationContext.xml,classpath*:META-INF/spring/*-applicationContext.xml</param-value>
     </context-param>
     <!-- Servlet Filters ================================================ -->
-    <context-param>
+<!--    <context-param>
         <param-name>logbackConfigLocation</param-name>
-        <param-value>WEB-INF/logback.xml</param-value>
+        <param-value>/WEB-INF/logback.xml</param-value>
     </context-param>
-    <context-param>
-        <param-name>webAppRootKey</param-name>
-        <param-value>riskManagement.root</param-value>
-    </context-param>
-    <listener>
-        <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
-    </listener>
+
+    <servlet>
+        <servlet-name>logbackConfigListener</servlet-name>
+        <servlet-class>ch.qos.logback.ext.spring.web.LogbackConfigServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>-->
+
+    <!--<listener>-->
+        <!--<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>-->
+    <!--</listener>-->
 
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -78,6 +81,8 @@
     </filter-mapping>
 
 
+
+
     <servlet>
         <servlet-name>jerseyServlet</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
@@ -106,5 +111,9 @@
         <param-name>UPLOAD_IMAGE_PATH</param-name>
         <param-value>/imageupload</param-value>
     </context-param>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 </web-app>
         

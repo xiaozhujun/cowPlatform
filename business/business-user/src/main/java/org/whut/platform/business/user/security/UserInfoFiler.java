@@ -31,7 +31,8 @@ public class UserInfoFiler implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         String currentURL = request.getRequestURI(); // 取得根目录所对应的绝对路径:
-        String targetURL = currentURL.substring(currentURL.indexOf("/", 1),
+        logger.info("user request url: " + currentURL);
+        String targetURL = currentURL.substring(currentURL.indexOf("/", 0),
                 currentURL.length()); // 截取到当前文件名用于比较
         logger.info("targetUrl: "+targetURL);
         if ("/rs/user/isLogin".equals(targetURL)||"/j_spring_security_check".equals(targetURL)) {

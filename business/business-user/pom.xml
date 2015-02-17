@@ -127,6 +127,12 @@
             <artifactId>spring-security-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cowPlatform</groupId>
+            <artifactId>fundamental-bcs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

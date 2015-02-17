@@ -19,7 +19,9 @@
     <http pattern="/rs/template/findByCondition" security="none"/>
     <http pattern="/rs/template/getByNumber" security="none"/>
     <http pattern="/rs/template/getByCategory" security="none"/>
-    <http pattern="/rs/userTemplate/getByNumber" security="none"/>
+    <http pattern="/rs/userTemplate/getByNumber/**" security="none"/>
+    <http pattern="/rs/resource/**" security="none"/>
+    <http pattern="/rs/resourceIcon/**" security="none"/>
 
     <!-- 以下文件不检查权限 -->
     <http  auto-config="true"><!-- 访问权限 -->

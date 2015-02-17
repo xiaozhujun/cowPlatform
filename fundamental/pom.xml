@@ -23,6 +23,7 @@
         <module>fundamental-fileupload</module>
         <module>fundamental-mongoConnector</module>
         <module>fundamental-redisConnector</module>
+        <module>fundamental-bcs</module>
     </modules>
 
 

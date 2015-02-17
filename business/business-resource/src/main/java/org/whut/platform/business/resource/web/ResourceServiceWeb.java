@@ -10,6 +10,7 @@ import org.whut.platform.business.resource.entity.Resource;
 import org.whut.platform.business.resource.entity.ResourceStatus;
 import org.whut.platform.business.resource.service.ResourceService;
 import org.whut.platform.business.user.security.UserContext;
+import org.whut.platform.fundamental.bcs.BcsProxy;
 import org.whut.platform.fundamental.config.FundamentalConfigProvider;
 import org.whut.platform.fundamental.logger.PlatformLogger;
 import org.whut.platform.fundamental.util.json.JsonMapper;
@@ -97,43 +98,48 @@ public class ResourceServiceWeb {
         if(request==null){
             return JsonResultUtils.getCodeAndMesByStringAsDefault(JsonResultUtils.Code.ERROR);
         }
-        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-        MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
-        String resourceType = multipartRequest.getParameter("resourceType");
-        if(resourceType!=null&&!resourceType.trim().equals("")){
-            resourceType+="/";
-        }else{
-            resourceType="";
-        }
-
-        MultipartFile file = multipartRequest.getFile("filename");
-        String filename = file.getOriginalFilename();
-        String[] temp = filename.split("\\.");
-        String suffix = temp[temp.length-1];
-
-        //获得模板路径
-        String resourceRootPath =  FundamentalConfigProvider.get("user.template.resource.root.path") ;
-        String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path")+"/"+resourceType ;
-        String resourceUploadPath = resourceRootPath + resourceRelativePath;
-
-        String resourceName = UUID.randomUUID().toString();
-        String resourcePath =  resourceUploadPath + resourceName + "." + suffix;
-        String resourceWebPath = resourceRelativePath + resourceName +"." + suffix;
-
-        //如果文件存在则删除
-        File resourceFile = new File(resourcePath);
-        if(resourceFile.exists()){
-            resourceFile.delete();
-        }else{
-            File resourceDir = new File(resourceUploadPath);
-            if(!resourceDir.exists()){
-                resourceDir.mkdirs();
-            }
-        }
-
-        //写用户图片文件到指定路径
         try {
-            file.transferTo(resourceFile);
+            MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+            MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
+            String resourceType = multipartRequest.getParameter("resourceType");
+            if(resourceType!=null&&!resourceType.trim().equals("")){
+                resourceType+="/";
+            }else{
+                resourceType="";
+            }
+
+            MultipartFile file = multipartRequest.getFile("filename");
+            String filename = file.getOriginalFilename();
+            String[] temp = filename.split("\\.");
+            String suffix = temp[temp.length-1];
+
+            //获得模板路径
+            String resourceRootPath =  FundamentalConfigProvider.get("user.template.resource.root.path") ;
+            String resourceRelativePath =  FundamentalConfigProvider.get("user.template.resource.relative.path")+"/"+resourceType ;
+            String resourceUploadPath = resourceRootPath + resourceRelativePath;
+
+            String resourceName = UUID.randomUUID().toString();
+            String resourcePath =  resourceUploadPath + resourceName + "." + suffix;
+            String resourceWebPath = resourceRelativePath + resourceName +"." + suffix;
+
+
+
+            if(FundamentalConfigProvider.isBae()){
+                resourceWebPath = BcsProxy.uploadFile(file.getInputStream(),resourceWebPath);
+            }else{
+                //如果文件存在则删除
+                File resourceFile = new File(resourcePath);
+                if(resourceFile.exists()){
+                    resourceFile.delete();
+                }else{
+                    File resourceDir = new File(resourceUploadPath);
+                    if(!resourceDir.exists()){
+                        resourceDir.mkdirs();
+                    }
+                }
+                //写用户图片文件到指定路径
+                file.transferTo(resourceFile);
+            }
 
             Resource resource = new Resource();
             resource.setCreateTime(new Date());
@@ -147,6 +153,10 @@ public class ResourceServiceWeb {
             map.put("resourcePath",resourceWebPath);
             map.put("resourceId",resource.getId());
             return JsonResultUtils.getObjectResultByStringAsDefault(map,JsonResultUtils.Code.SUCCESS);
+
+
+
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
